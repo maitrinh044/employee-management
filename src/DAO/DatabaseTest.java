@@ -11,7 +11,7 @@ package DAO;
 import java.sql.*;
 
 public class DatabaseTest {
-    private static final String URL = "jdbc:mysql://localhost:3306/QLSinhVien";
+    private static final String URL = "jdbc:mysql://localhost:3306/employee_management";
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
@@ -23,14 +23,6 @@ public class DatabaseTest {
             // Kết nối đến MySQL database
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
             System.out.println("Kết nối thành công!");
-            
-            Statement stmt = connection.createStatement();
-            String query = "SELECT sv.MSSV, sv.HoTen, sv.NamSinh, Khoa.TenKhoa FROM SinhVien sv JOIN Khoa ON sv.MaKhoa = Khoa.MaKhoa";
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                System.out.println("ID: " + rs.getInt(1) + "\tHo ten: " + rs.getString(2)
-                        + "\tNam sinh: " + rs.getInt(3) + "\tKhoa: " + rs.getString(4));
-            } 
             
             // Đóng kết nối
             connection.close();
