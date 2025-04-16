@@ -4,6 +4,8 @@
  */
 package employeemanager;
 
+import GUI.Main;
+
 /**
  *
  * @author MaiTrinh
@@ -15,6 +17,7 @@ public class EmployeeManager {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        new Main();
     }
     
 }
