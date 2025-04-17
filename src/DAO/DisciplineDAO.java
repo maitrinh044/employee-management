@@ -4,13 +4,10 @@
  */
 package DAO;
 
-import DTO.DisciplineDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -18,7 +15,6 @@ import java.util.List;
  */
 
 import DTO.DisciplineDTO;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +93,83 @@ public class DisciplineDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    // Lọc kỷ luật theo employeeId và status
+    public List<DisciplineDTO> filterByEmployeeIdAndStatus(int employeeId, boolean status) {
+        List<DisciplineDTO> disciplines = new ArrayList<>();
+        String sql = "SELECT * FROM discipline WHERE employee_id = ? AND status = ?";
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, employeeId);
+            stmt.setBoolean(2, status);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                DisciplineDTO discipline = new DisciplineDTO();
+                discipline.setDisciplineId(rs.getInt("discipline_id"));
+                discipline.setEmployeeId(rs.getInt("employee_id"));
+                discipline.setDisciplineType(rs.getString("discipline_type"));
+                discipline.setDisciplineAmount(rs.getInt("discipline_amount"));
+                discipline.setDescription(rs.getString("description"));
+                discipline.setStatus(rs.getBoolean("status"));
+                disciplines.add(discipline);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return disciplines;
+    }
+
+    // Lấy kỷ luật theo khoảng thời gian
+    public List<DisciplineDTO> getDisciplinesByDateRange(int employeeId, String startDate, String endDate) {
+        List<DisciplineDTO> disciplines = new ArrayList<>();
+        String sql = "SELECT * FROM discipline WHERE employee_id = ? AND discipline_date BETWEEN ? AND ?";
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, employeeId);
+            stmt.setString(2, startDate);
+            stmt.setString(3, endDate);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                DisciplineDTO discipline = new DisciplineDTO();
+                discipline.setDisciplineId(rs.getInt("discipline_id"));
+                discipline.setEmployeeId(rs.getInt("employee_id"));
+                discipline.setDisciplineType(rs.getString("discipline_type"));
+                discipline.setDisciplineAmount(rs.getInt("discipline_amount"));
+                discipline.setDescription(rs.getString("description"));
+                discipline.setStatus(rs.getBoolean("status"));
+                disciplines.add(discipline);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return disciplines;
+    }
+    
+    // Lấy tổng số kỷ luật của nhân viên trong tháng
+    public int getTotalDisciplineForEmployeeInMonth(int employeeId, int month, int year) {
+        int totalDiscipline = 0;
+        String sql = "SELECT SUM(discipline_amount) AS totalDiscipline " +
+                     "FROM discipline " +
+                     "WHERE employee_id = ? AND MONTH(discipline_date) = ? AND YEAR(discipline_date) = ?";
+        
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, employeeId);
+            stmt.setInt(2, month);
+            stmt.setInt(3, year);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    totalDiscipline = rs.getInt("totalDiscipline");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return totalDiscipline;
     }
 }
 

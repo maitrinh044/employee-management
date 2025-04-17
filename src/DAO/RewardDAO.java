@@ -90,4 +90,81 @@ public class RewardDAO {
         }
         return false;
     }
+    
+    // Lọc phần thưởng theo employeeId và status
+    public List<RewardDTO> filterByEmployeeIdAndStatus(int employeeId, boolean status) {
+        List<RewardDTO> rewards = new ArrayList<>();
+        String sql = "SELECT * FROM reward WHERE employee_id = ? AND status = ?";
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, employeeId);
+            stmt.setBoolean(2, status);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                RewardDTO reward = new RewardDTO();
+                reward.setRewardId(rs.getInt("reward_id"));
+                reward.setEmployeeId(rs.getInt("employee_id"));
+                reward.setRewardDate(rs.getString("reward_date"));
+                reward.setRewardValue(rs.getInt("reward_value"));
+                reward.setDescription(rs.getString("description"));
+                reward.setStatus(rs.getBoolean("status"));
+                rewards.add(reward);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rewards;
+    }
+
+    // Lấy thưởng theo khoảng thời gian
+    public List<RewardDTO> getRewardsByDateRange(int employeeId, String startDate, String endDate) {
+        List<RewardDTO> rewards = new ArrayList<>();
+        String sql = "SELECT * FROM reward WHERE employee_id = ? AND reward_date BETWEEN ? AND ?";
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, employeeId);
+            stmt.setString(2, startDate);
+            stmt.setString(3, endDate);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                RewardDTO reward = new RewardDTO();
+                reward.setRewardId(rs.getInt("reward_id"));
+                reward.setEmployeeId(rs.getInt("employee_id"));
+                reward.setRewardDate(rs.getString("reward_date"));
+                reward.setRewardValue(rs.getInt("reward_value"));
+                reward.setDescription(rs.getString("description"));
+                reward.setStatus(rs.getBoolean("status"));
+                rewards.add(reward);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rewards;
+    }
+    
+    // Lấy tổng số thưởng của nhân viên trong tháng
+    public int getTotalRewardForEmployeeInMonth(int employeeId, int month, int year) {
+        int totalReward = 0;
+        String sql = "SELECT SUM(reward_value) AS totalReward " +
+                     "FROM reward " +
+                     "WHERE employee_id = ? AND MONTH(reward_date) = ? AND YEAR(reward_date) = ?";
+        
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, employeeId);
+            stmt.setInt(2, month);
+            stmt.setInt(3, year);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    totalReward = rs.getInt("totalReward");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return totalReward;
+    }
 }

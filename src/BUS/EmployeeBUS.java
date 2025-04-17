@@ -26,15 +26,21 @@ public class EmployeeBUS {
 
     // Thêm nhân viên
     public boolean addEmployee(EmployeeDTO emp) {
-        // Kiểm tra điều kiện
-        return employeeDAO.addEmployee(emp);
+    if (emp == null || emp.getFullName()== null || emp.getFullName().trim().isEmpty()) {
+        System.out.println("Thông tin nhân viên không hợp lệ");
+        return false;
     }
+    return employeeDAO.addEmployee(emp);
+}
 
-    // Cập nhật nhân viên
     public boolean updateEmployee(EmployeeDTO emp) {
-        // Kiểm tra điều kiện
+        if (emp == null || emp.getEmployeeId()<= 0) {
+            System.out.println("Nhân viên không tồn tại hoặc ID không hợp lệ");
+            return false;
+        }
         return employeeDAO.updateEmployee(emp);
     }
+
 
     // Cập nhật trạng thái nhân viên (ẩn/xóa mềm)
     public boolean updateEmployeeStatus(int id, boolean status) {
@@ -43,8 +49,9 @@ public class EmployeeBUS {
     }
 
     // Tìm kiếm nhân viên theo từ khóa
-//    public List<EmployeeDTO> searchEmployees(String keyword) {
-//        return employeeDAO.search(keyword);
-//    }
+    public List<EmployeeDTO> searchEmployees(String keyword) {
+        return employeeDAO.search(keyword);
+    }
+
 }
 

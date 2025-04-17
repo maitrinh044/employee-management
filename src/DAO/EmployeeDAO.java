@@ -152,5 +152,27 @@ public class EmployeeDAO {
         return false;
     }
     
+    public List<EmployeeDTO> search(String keyword) {
+        List<EmployeeDTO> list = new ArrayList<>();
+        String sql = "SELECT * FROM employees WHERE status = true AND (name LIKE ? OR position_id LIKE ?)";
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + keyword + "%");
+            stmt.setString(2, "%" + keyword + "%");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                EmployeeDTO emp = new EmployeeDTO();
+                emp.setEmployeeId(rs.getInt("employee_id"));
+                emp.setFullName(rs.getString("name"));
+                emp.setPositionId(rs.getInt("position_id"));
+                emp.setStatus(rs.getBoolean("status"));
+                list.add(emp);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }
 

@@ -50,6 +50,29 @@ public class ProjectDAO {
         }
         return false;
     }
+    
+    public boolean update(ProjectDTO project) {
+        String sql = "UPDATE project SET project_name = ?, start_date = ?, end_date = ?, manager_id = ?, status = ? WHERE project_id = ?";
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, project.getProjectName());
+            stmt.setString(2, project.getStartDate());
+            stmt.setString(3, project.getEndDate());
+            stmt.setInt(4, project.getManagerId());
+            stmt.setBoolean(5, project.getStatus());
+            stmt.setInt(6, project.getProjectId());
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     public boolean updateStatus(int id, boolean status) {
         String sql = "UPDATE project SET status = ? WHERE project_id = ?";

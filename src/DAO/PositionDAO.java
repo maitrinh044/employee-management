@@ -10,74 +10,182 @@ package DAO;
  */
 
 import DTO.PositionDTO;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PositionDAO {
-    DatabaseConnect db = new DatabaseConnect();
 
-    public ArrayList<PositionDTO> getAll() {
-        ArrayList<PositionDTO> list = new ArrayList<>();
-        try {
-            String sql = "SELECT * FROM positions WHERE status = true";
-            ResultSet rs = db.sqlQuery(sql);
+    private final DatabaseConnect dbConnect;
+
+    public PositionDAO() {
+        dbConnect = new DatabaseConnect();
+    }
+
+    // Lấy tất cả các vị trí
+    public List<PositionDTO> getAllPositions() {
+        List<PositionDTO> positionList = new ArrayList<>();
+        String sql = "SELECT * FROM position";
+
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                PositionDTO p = new PositionDTO(
-                    rs.getInt("position_id"),
-                    rs.getString("position_name"),
-                    rs.getInt("base_salary"),
-                    rs.getBoolean("status")
-                );
-                list.add(p);
+                PositionDTO position = new PositionDTO();
+                position.setPositionId(rs.getInt("position_id"));
+                position.setPositionName(rs.getString("position_name"));
+                position.setBaseSalary(rs.getInt("base_salary"));
+                position.setStatus(rs.getBoolean("status"));
+                positionList.add(position);
             }
-        } catch (Exception e) {
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return positionList;
+    }
+
+    // Lấy vị trí theo ID
+    public PositionDTO getPositionById(int positionId) {
+        PositionDTO position = null;
+        String sql = "SELECT * FROM position WHERE position_id = ?";
+
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, positionId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                position = new PositionDTO();
+                position.setPositionId(rs.getInt("position_id"));
+                position.setPositionName(rs.getString("position_name"));
+                position.setBaseSalary(rs.getInt("base_salary"));
+                position.setStatus(rs.getBoolean("status"));
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return position;
+    }
+
+    // Cập nhật thông tin vị trí
+    public boolean updatePosition(PositionDTO position) {
+        String sql = "UPDATE position SET position_name = ?, base_salary = ?, status = ? WHERE position_id = ?";
+        boolean success = false;
+
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, position.getPositionName());
+            stmt.setInt(2, position.getBaseSalary());
+            stmt.setBoolean(3, position.isStatus());
+            stmt.setInt(4, position.getPositionId());
+
+            success = stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return success;
+    }
+
+    // Thêm mới vị trí
+    public boolean addPosition(PositionDTO position) {
+        String sql = "INSERT INTO position (position_name, base_salary, status) VALUES (?, ?, ?)";
+
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, position.getPositionName());
+            stmt.setInt(2, position.getBaseSalary());
+            stmt.setBoolean(3, position.isStatus());
+
+            int rowsInserted = stmt.executeUpdate();
+            return rowsInserted > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // Cập nhật trạng thái vị trí
+    public boolean updatePositionStatus(int positionId, boolean status) {
+        String sql = "UPDATE position SET status = ? WHERE position_id = ?";
+
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setBoolean(1, status);
+            stmt.setInt(2, positionId);
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // Tìm kiếm vị trí theo tên
+    public List<PositionDTO> search(String keyword) {
+        List<PositionDTO> list = new ArrayList<>();
+        String sql = "SELECT * FROM position WHERE position_name LIKE ? AND status = true";
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + keyword + "%");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                PositionDTO position = new PositionDTO();
+                position.setPositionId(rs.getInt("position_id"));
+                position.setPositionName(rs.getString("position_name"));
+                position.setBaseSalary(rs.getInt("base_salary"));
+                position.setStatus(rs.getBoolean("status"));
+                list.add(position);
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return list;
     }
+    
+    // Lấy thông tin vị trí của nhân viên theo employeeId
+    public PositionDTO getPositionByEmployeeId(int employeeId) {
+        PositionDTO position = null;
+        String sql = "SELECT p.position_id, p.position_name, p.base_salary, p.status " +
+                     "FROM position p " +
+                     "JOIN employee e ON p.position_id = e.position_id " +
+                     "WHERE e.employee_id = ?";
+        
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, employeeId);
 
-    public boolean add(PositionDTO p) {
-        String sql = "INSERT INTO positions (position_name, base_salary, status) VALUES (?, ?, true)";
-        try {
-            db.pstmt = db.getConnection().prepareStatement(sql);
-            db.pstmt.setString(1, p.getPositionName());
-            db.pstmt.setInt(2, p.getBaseSalary());
-            db.pstmt.executeUpdate();
-            return true;
-        } catch (Exception e) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    position = new PositionDTO();
+                    position.setPositionId(rs.getInt("position_id"));
+                    position.setPositionName(rs.getString("position_name"));
+                    position.setBaseSalary(rs.getInt("base_salary"));
+                    position.setStatus(rs.getBoolean("status"));
+                }
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+
+        return position;
     }
 
-    public boolean update(PositionDTO p) {
-        String sql = "UPDATE positions SET position_name = ?, base_salary = ?, status = ? WHERE position_id = ?";
-        try {
-            db.pstmt = db.getConnection().prepareStatement(sql);
-            db.pstmt.setString(1, p.getPositionName());
-            db.pstmt.setInt(2, p.getBaseSalary());
-            db.pstmt.setBoolean(3, p.isStatus());
-            db.pstmt.setInt(4, p.getPositionId());
-            db.pstmt.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-
-    public boolean updateStatus(int id, boolean status) {
-        String sql = "UPDATE positions SET status = ? WHERE position_id = ?";
-        try {
-            db.pstmt = db.getConnection().prepareStatement(sql);
-            db.pstmt.setBoolean(1, status);
-            db.pstmt.setInt(2, id);
-            db.pstmt.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 }
+
