@@ -8,15 +8,25 @@ package GUI;
  *
  * @author MaiTrinh
  */
-import GUI.EmployeeContentPanel;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.*;
 
 public class Main extends javax.swing.JFrame implements MouseListener {
 
     private JLabel selectedMenuItem = null;
     private EmployeeContentPanel employeeContentPanel;
+    private DepartmentContentPanel departmentContentPanel;
+    private ProjectContentPanel projectContentPanel;
+    private SalaryContentPanel salaryContentPanel;
+    private RewardContentPanel rewardContentPanel;
+    private DisciplineContentPanel discplContentPanel;
+    private StatisticContentPanel statsContentPanel;
+    private AccountContentPanel accountContentPanel;
+
+    private Map<JLabel, JPanel> labelPanelMap = new HashMap<>();
 
     /**
      * Creates new form MainForm
@@ -24,10 +34,26 @@ public class Main extends javax.swing.JFrame implements MouseListener {
     public Main() {
         initComponents();
         employeeContentPanel = new EmployeeContentPanel();
-        
-        staffLabel.addMouseListener(this);
+        departmentContentPanel = new DepartmentContentPanel();
+        projectContentPanel = new ProjectContentPanel();
+        salaryContentPanel = new SalaryContentPanel();
+        rewardContentPanel = new RewardContentPanel();
+        discplContentPanel = new DisciplineContentPanel();
+        statsContentPanel = new StatisticContentPanel();
+        accountContentPanel = new AccountContentPanel();
+
+        initMenu();
+
         profileLabel.addMouseListener(this);
-        
+        staffLabel.addMouseListener(this);
+        departmentLabel.addMouseListener(this);
+        projectLabel.addMouseListener(this);
+        salaryLabel.addMouseListener(this);
+        rewardLabel.addMouseListener(this);
+        discplLabel.addMouseListener(this);
+        statsLabel.addMouseListener(this);
+        accountLabel.addMouseListener(this);
+
         contentPanel.setLayout(new BorderLayout());
         setVisible(true);
     }
@@ -49,6 +75,7 @@ public class Main extends javax.swing.JFrame implements MouseListener {
         projectLabel = new javax.swing.JLabel();
         salaryLabel = new javax.swing.JLabel();
         rewardLabel = new javax.swing.JLabel();
+        discplLabel = new javax.swing.JLabel();
         statsLabel = new javax.swing.JLabel();
         accountLabel = new javax.swing.JLabel();
         logoutLabel = new javax.swing.JLabel();
@@ -119,6 +146,15 @@ public class Main extends javax.swing.JFrame implements MouseListener {
         rewardLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         rewardLabel.setOpaque(true);
         manageMenu.add(rewardLabel);
+
+        discplLabel.setBackground(new java.awt.Color(102, 102, 102));
+        discplLabel.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        discplLabel.setForeground(new java.awt.Color(255, 255, 255));
+        discplLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/discipline.png"))); // NOI18N
+        discplLabel.setText("Quản lý kỷ luật");
+        discplLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        discplLabel.setOpaque(true);
+        manageMenu.add(discplLabel);
 
         statsLabel.setBackground(new java.awt.Color(102, 102, 102));
         statsLabel.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
@@ -213,49 +249,56 @@ public class Main extends javax.swing.JFrame implements MouseListener {
     /**
      * @param args the command line arguments
      */
+    private void initMenu() {
+        labelPanelMap.put(profileLabel, null); // Không có panel cụ thể
+
+        labelPanelMap.put(staffLabel, employeeContentPanel);
+        labelPanelMap.put(departmentLabel, departmentContentPanel);
+        labelPanelMap.put(projectLabel, projectContentPanel);
+        labelPanelMap.put(salaryLabel, salaryContentPanel);
+        labelPanelMap.put(rewardLabel, rewardContentPanel);
+        labelPanelMap.put(discplLabel, discplContentPanel);
+        labelPanelMap.put(statsLabel, statsContentPanel);
+        labelPanelMap.put(accountLabel, accountContentPanel);
+
+    }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         JLabel clickedLabel = (JLabel) e.getSource();
 
-        System.out.println(selectedMenuItem);
-        
-        // Reset background của label trước đó (nếu có)
+        // Reset background của label trước đó
         if (selectedMenuItem != null) {
-            selectedMenuItem.setOpaque(false);
-            selectedMenuItem.setBackground(new Color(102, 102, 102)); // Màu nền mặc định
+//            selectedMenuItem.setOpaque(false);
+            selectedMenuItem.setBackground(new Color(102, 102, 102));
         }
 
-        // Cập nhật label được chọn và thay đổi màu nền
+        // Cập nhật lại label được chọn
         selectedMenuItem = clickedLabel;
         clickedLabel.setOpaque(true);
-        clickedLabel.setBackground(new Color(30, 30, 30)); // Màu nền nhấn vào
+        clickedLabel.setBackground(new Color(30, 30, 30));
 
-        // Xử lý chuyển đổi content panel dựa vào label được nhấn
-        if (clickedLabel == staffLabel) {
-            showEmployeeContentPanel();
-        } else if (clickedLabel == profileLabel) {
-            showProfileContentPanel();
-        }
-        
+        // Hiển thị panel tương ứng
+        JPanel panelToShow = labelPanelMap.get(clickedLabel);
+
+        showContent(panelToShow);
     }
 
-    private void showEmployeeContentPanel() {
-        contentPanel.removeAll(); // Xóa nội dung cũ
-        contentPanel.add(employeeContentPanel); // Thêm panel mới (Giả sử bạn có EmployeePanel)
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
-    
-    private void showProfileContentPanel() {
+    private void showContent(JPanel panel) {
         contentPanel.removeAll();
+        if (panel != null) {
+            contentPanel.add(panel);
+        }
         contentPanel.revalidate();
         contentPanel.repaint();
     }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel accountLabel;
     private javax.swing.JPanel contentPanel;
     private javax.swing.JLabel departmentLabel;
+    private javax.swing.JLabel discplLabel;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel logoutLabel;
     private javax.swing.JPanel manageMenu;

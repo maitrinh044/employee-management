@@ -1,3 +1,9 @@
+DROP DATABASE IF EXISTS employee_management;
+
+CREATE DATABASE employee_management;
+
+USE employee_management;
+
 -- Drop tables if they exist (the order matters due to foreign key constraints)
 DROP TABLE IF EXISTS discipline;
 DROP TABLE IF EXISTS rewards;
@@ -16,6 +22,21 @@ CREATE TABLE roles (
   role_name VARCHAR(255)
 );
 
+-- Create employees table
+CREATE TABLE employees (
+  employee_id INT PRIMARY KEY,
+  full_name VARCHAR(255),
+  birthday DATE,
+  gender ENUM('Male', 'Female', 'Other'),
+  phone_number BIGINT,
+  address VARCHAR(255),
+  position_id INT,
+  department_id INT,
+  FOREIGN KEY (position_id) REFERENCES positions(position_id),
+  FOREIGN KEY (department_id) REFERENCES departments(department_id)
+);
+
+
 -- Create positions table
 CREATE TABLE positions (
   position_id INT PRIMARY KEY,
@@ -29,20 +50,6 @@ CREATE TABLE departments (
   department_name VARCHAR(255),
   manager_id INT UNIQUE,
   FOREIGN KEY (manager_id) REFERENCES employees(employee_id)
-);
-
--- Create employees table
-CREATE TABLE employees (
-  employee_id INT PRIMARY KEY,
-  full_name VARCHAR(255),
-  birthday DATE,
-  gender ENUM('Male', 'Female', 'Other'),
-  phone_number BIGINT,
-  address VARCHAR(255),
-  position_id INT,
-  department_id INT,
-  FOREIGN KEY (position_id) REFERENCES positions(position_id),
-  FOREIGN KEY (department_id) REFERENCES departments(department_id)
 );
 
 -- Create accounts table
