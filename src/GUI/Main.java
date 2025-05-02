@@ -8,6 +8,13 @@ package GUI;
  *
  * @author MaiTrinh
  */
+import GUI.Reward.RewardContentPanel;
+import GUI.Discipline.DisciplineContentPanel;
+import GUI.Salary.SalaryContentPanel;
+import GUI.Project.ProjectContentPanel;
+import GUI.Department.DepartmentContentPanel;
+import GUI.Employee.EmployeeContentPanel;
+import GUI.Account.AccountContentPanel;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
@@ -55,6 +62,7 @@ public class Main extends javax.swing.JFrame implements MouseListener {
         accountLabel.addMouseListener(this);
 
         contentPanel.setLayout(new BorderLayout());
+        setResizable(false);
         setVisible(true);
     }
 
@@ -83,14 +91,19 @@ public class Main extends javax.swing.JFrame implements MouseListener {
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(1100, 700));
+        setMinimumSize(new java.awt.Dimension(1400, 730));
+        setPreferredSize(new java.awt.Dimension(1400, 730));
         setResizable(false);
-        setSize(new java.awt.Dimension(1100, 800));
+        setSize(new java.awt.Dimension(1400, 730));
 
         menuPanel.setBackground(new java.awt.Color(204, 204, 204));
         menuPanel.setPreferredSize(new java.awt.Dimension(200, 700));
 
         manageMenu.setBackground(new java.awt.Color(204, 204, 204));
+        manageMenu.setAlignmentX(0.0F);
+        manageMenu.setAlignmentY(0.0F);
+        manageMenu.setMinimumSize(new java.awt.Dimension(200, 600));
+        manageMenu.setPreferredSize(new java.awt.Dimension(200, 600));
         manageMenu.setLayout(new java.awt.GridLayout(9, 1));
 
         profileLabel.setBackground(new java.awt.Color(102, 102, 102));
@@ -199,29 +212,43 @@ public class Main extends javax.swing.JFrame implements MouseListener {
         menuPanelLayout.setVerticalGroup(
             menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(menuPanelLayout.createSequentialGroup()
-                .addComponent(manageMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(manageMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addComponent(logoutLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         contentPanel.setBackground(new java.awt.Color(255, 255, 255));
-        contentPanel.setPreferredSize(new java.awt.Dimension(1000, 700));
-        contentPanel.setLayout(new java.awt.BorderLayout());
+        contentPanel.setMaximumSize(new java.awt.Dimension(1200, 800));
+        contentPanel.setMinimumSize(new java.awt.Dimension(1200, 800));
+        contentPanel.setPreferredSize(new java.awt.Dimension(1200, 700));
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
+        jPanel1.setMinimumSize(new java.awt.Dimension(1000, 700));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1200, 700));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 894, Short.MAX_VALUE)
+            .addGap(0, 1200, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 859, Short.MAX_VALUE)
+            .addGap(0, 700, Short.MAX_VALUE)
         );
 
-        contentPanel.add(jPanel1, java.awt.BorderLayout.CENTER);
+        javax.swing.GroupLayout contentPanelLayout = new javax.swing.GroupLayout(contentPanel);
+        contentPanel.setLayout(contentPanelLayout);
+        contentPanelLayout.setHorizontalGroup(
+            contentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        contentPanelLayout.setVerticalGroup(
+            contentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(contentPanelLayout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -229,16 +256,16 @@ public class Main extends javax.swing.JFrame implements MouseListener {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(menuPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 894, Short.MAX_VALUE))
+                .addGap(0, 0, 0)
+                .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 859, Short.MAX_VALUE)
-                    .addComponent(menuPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 859, Short.MAX_VALUE)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(menuPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(contentPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         contentPanel.getAccessibleContext().setAccessibleDescription("");

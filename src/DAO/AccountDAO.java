@@ -25,7 +25,7 @@ public class AccountDAO {
     // Lấy tất cả tài khoản
     public List<AccountDTO> getAll() {
         List<AccountDTO> accounts = new ArrayList<>();
-        String sql = "SELECT * FROM account WHERE status = true";
+        String sql = "SELECT * FROM accounts WHERE status = true";
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -47,7 +47,7 @@ public class AccountDAO {
 
     // Thêm tài khoản mới
     public boolean add(AccountDTO account) {
-        String sql = "INSERT INTO account (employee_id, username, role_id, created_at, status) VALUES (?, ?, ?, ?, true)";
+        String sql = "INSERT INTO accounts (employee_id, username, role_id, created_at, status) VALUES (?, ?, ?, ?, true)";
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, account.getEmployeeId());
@@ -64,7 +64,7 @@ public class AccountDAO {
 
     // Cập nhật tài khoản
     public boolean update(AccountDTO account) {
-        String sql = "UPDATE account SET username = ?, role_id = ?, created_at = ? WHERE account_id = ?";
+        String sql = "UPDATE accounts SET username = ?, role_id = ?, created_at = ? WHERE account_id = ?";
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, account.getUsername());
@@ -81,7 +81,7 @@ public class AccountDAO {
 
     // Cập nhật trạng thái tài khoản
     public boolean updateStatus(int accountId, boolean status) {
-        String sql = "UPDATE account SET status = ? WHERE account_id = ?";
+        String sql = "UPDATE accounts SET status = ? WHERE account_id = ?";
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setBoolean(1, status);
@@ -97,7 +97,7 @@ public class AccountDAO {
     // Tìm kiếm tài khoản theo username
     public AccountDTO getByUsername(String username) {
         AccountDTO account = null;
-        String sql = "SELECT * FROM account WHERE username = ?";
+        String sql = "SELECT * FROM accounts WHERE username = ?";
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
@@ -120,7 +120,7 @@ public class AccountDAO {
     // Lọc tài khoản theo roleId
     public List<AccountDTO> getByRole(int roleId) {
         List<AccountDTO> accounts = new ArrayList<>();
-        String sql = "SELECT * FROM account WHERE role_id = ? AND status = true";
+        String sql = "SELECT * FROM accounts WHERE role_id = ? AND status = true";
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, roleId);
@@ -144,7 +144,7 @@ public class AccountDAO {
     // Lấy tài khoản theo employeeId
     public AccountDTO getByEmployeeId(int employeeId) {
         AccountDTO account = null;
-        String sql = "SELECT * FROM account WHERE employee_id = ?";
+        String sql = "SELECT * FROM accounts WHERE employee_id = ?";
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, employeeId);

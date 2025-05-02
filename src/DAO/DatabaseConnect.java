@@ -12,6 +12,7 @@ import java.sql.*;
 import javax.swing.JOptionPane;
 
 public class DatabaseConnect {
+
     private static final String URL = "jdbc:mysql://localhost:3306/employee_management";
     private static final String USER = "root";
     private static final String PASSWORD = "";
@@ -21,20 +22,22 @@ public class DatabaseConnect {
     Statement stmt = null;
     PreparedStatement pstmt = null;
     ResultSet rset = null;
-        
+
     public DatabaseConnect() {
         checkDriver();
         setupConnect();
     }
 
-    
     public Connection getConnection() {
-        if (checkConnect()) {
-            return conn;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (ClassNotFoundException | SQLException e) {
+            JOptionPane.showMessageDialog(null, "-- ERROR! Không thể kết nối tới cơ sở dữ liệu\n" + e.getMessage());
+            return null;
         }
-        return null;
     }
-    
+
     private void setupConnect() {
 
         try {
@@ -47,7 +50,7 @@ public class DatabaseConnect {
             JOptionPane.showMessageDialog(null, "-- ERROR! Không thể kết nối tới cơ sở dữ liệu");
         }
     }
-    
+
     public Boolean checkConnect() {
         if (conn == null) {
             JOptionPane.showMessageDialog(null,
@@ -56,7 +59,7 @@ public class DatabaseConnect {
         }
         return true;
     }
-    
+
     public void closeConnect() {
         try {
             if (conn != null) {
@@ -73,7 +76,7 @@ public class DatabaseConnect {
                     "-- ERROR! Không thể đóng kết nối tới cơ sở dữ liệu\n" + ex.getLocalizedMessage());
         }
     }
-    
+
     private void checkDriver() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -113,6 +116,5 @@ public class DatabaseConnect {
         }
         return false;
     }
-    
-}
 
+}
