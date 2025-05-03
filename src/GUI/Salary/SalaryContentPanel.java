@@ -4,17 +4,76 @@
  */
 package GUI.Salary;
 
+import BUS.EmployeeBUS;
+import BUS.SalaryBUS;
+import DTO.EmployeeDTO;
+import DTO.SalaryDTO;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author MaiTrinh
  */
 public class SalaryContentPanel extends javax.swing.JPanel {
 
+    private SalaryBUS salaryBUS;
+    private EmployeeBUS emplBUS;
+    private List<SalaryDTO> salaryList;
+    private SalaryAdd addForm;
+    private SalaryEdit editForm;
+
     /**
      * Creates new form SalaryContentPanel
      */
     public SalaryContentPanel() {
         initComponents();
+        salaryBUS = new SalaryBUS();
+        emplBUS = new EmployeeBUS();
+
+        salaryList = salaryBUS.getAllSalaries();
+        loadDataToTable(salaryList);
+
+        List<Integer> yearList = salaryBUS.getAllYear();
+        for (int year : yearList) {
+            cbbYear.addItem(year);
+        }
+        List<Integer> monthList = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            monthList.add(i);
+            cbbMonth.addItem(i);
+        }
+
+    }
+
+    public void loadDataToTable(List<SalaryDTO> salaryList) {
+        String[] columnNames = {"STT", "Mã nhân viên", "Tên nhân viên", "Tiền lương", "Tháng", "Năm"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+
+        jTable1.getTableHeader().setPreferredSize(new java.awt.Dimension(jTable1.getTableHeader().getPreferredSize().width, 40));
+        jTable1.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));  // 14 là kích cỡ chữ
+        jTable1.getTableHeader().setBackground(Color.BLACK);
+        jTable1.getTableHeader().setForeground(Color.WHITE);
+        jTable1.setShowGrid(false);  // Tắt hiển thị grid (bao gồm đường viền giữa các dòng và cột)
+        jTable1.setIntercellSpacing(new java.awt.Dimension(0, 0)); // Giảm khoảng cách giữa các ô
+
+        for (SalaryDTO salary : salaryList) {
+            EmployeeDTO empl = emplBUS.getById(salary.getEmployeeId());
+            Object[] rowData = {
+                salary.getSalaryId(),
+                salary.getEmployeeId(),
+                empl.getFullName(),
+                salary.getSalaryAmount(),
+                salary.getMonth(),
+                salary.getYear()
+            };
+            model.addRow(rowData);
+        }
+
+        jTable1.setModel(model);
     }
 
     /**
@@ -30,12 +89,10 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         jPanel10 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         btnAdd4 = new javax.swing.JButton();
-        btnDel = new javax.swing.JButton();
         btnImport = new javax.swing.JButton();
         btnExport = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
         txtSearch = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -81,12 +138,6 @@ public class SalaryContentPanel extends javax.swing.JPanel {
             }
         });
 
-        btnDel.setBackground(new java.awt.Color(255, 102, 102));
-        btnDel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnDel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/remove.png"))); // NOI18N
-        btnDel.setText("Xóa");
-        btnDel.setPreferredSize(new java.awt.Dimension(75, 25));
-
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/excel.png"))); // NOI18N
         btnImport.setText("Nhập");
@@ -103,6 +154,11 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/edit.png"))); // NOI18N
         btnEdit.setText("Sửa");
         btnEdit.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
@@ -111,13 +167,11 @@ public class SalaryContentPanel extends javax.swing.JPanel {
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addGap(70, 70, 70)
                 .addComponent(btnAdd4, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66)
+                .addGap(125, 125, 125)
                 .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66)
-                .addComponent(btnDel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66)
+                .addGap(148, 148, 148)
                 .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66)
+                .addGap(110, 110, 110)
                 .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(70, 70, 70))
         );
@@ -127,7 +181,6 @@ public class SalaryContentPanel extends javax.swing.JPanel {
                 .addGap(10, 10, 10)
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAdd4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnDel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -137,15 +190,6 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Tìm kiếm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
         jPanel1.setPreferredSize(new java.awt.Dimension(1000, 100));
-
-        jComboBox1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Theo tên", "Theo mã" }));
-        jComboBox1.setMinimumSize(new java.awt.Dimension(75, 25));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
 
         txtSearch.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtSearch.setPreferredSize(new java.awt.Dimension(75, 25));
@@ -157,6 +201,11 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         jButton1.setMaximumSize(new java.awt.Dimension(75, 25));
         jButton1.setMinimumSize(new java.awt.Dimension(75, 25));
         jButton1.setPreferredSize(new java.awt.Dimension(75, 25));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -164,9 +213,7 @@ public class SalaryContentPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 678, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 814, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(41, Short.MAX_VALUE))
@@ -176,8 +223,7 @@ public class SalaryContentPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(10, Short.MAX_VALUE))
         );
@@ -215,7 +261,6 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         jPanel2.setPreferredSize(new java.awt.Dimension(1000, 100));
 
         cbbMonth.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        cbbMonth.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Theo tên", "Theo mã" }));
         cbbMonth.setMinimumSize(new java.awt.Dimension(75, 25));
         cbbMonth.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -229,6 +274,11 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         btnFilter.setMaximumSize(new java.awt.Dimension(75, 25));
         btnFilter.setMinimumSize(new java.awt.Dimension(75, 25));
         btnFilter.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setText("Tháng:");
@@ -237,7 +287,6 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         jLabel2.setText("Năm:");
 
         cbbYear.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        cbbYear.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Theo tên", "Theo mã" }));
         cbbYear.setMinimumSize(new java.awt.Dimension(75, 25));
         cbbYear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -324,11 +373,19 @@ public class SalaryContentPanel extends javax.swing.JPanel {
 
     private void btnAdd4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdd4ActionPerformed
         // TODO add your handling code here:
+        addForm = new SalaryAdd();
+        addForm.setTitle("Thêm lương nhân viên");
+        addForm.setVisible(true);
+        
+        // Bắt sự kiện khi cửa sổ đóng lại
+        addForm.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                salaryList = salaryBUS.getAllSalaries();
+                loadDataToTable(salaryList);
+            }
+        });
     }//GEN-LAST:event_btnAdd4ActionPerformed
-
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void cbbMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbMonthActionPerformed
         // TODO add your handling code here:
@@ -338,19 +395,67 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_cbbYearActionPerformed
 
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow >= 0) {
+            int id = (int) jTable1.getValueAt(selectedRow, 0);
+            SalaryDTO salary = salaryBUS.getById(id);
+            editForm = new SalaryEdit(salary);
+            editForm.setTitle("Sửa lương nhân viên");
+            editForm.setVisible(true);
+
+            // Bắt sự kiện khi cửa sổ đóng lại
+            editForm.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    salaryList = salaryBUS.getAllSalaries();
+                    loadDataToTable(salaryList);
+                }
+            });
+        } else {
+            JOptionPane.showMessageDialog(null, "Vui lòng chọn một bảng lương để sửa thông tin", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        // search
+        String keyword = txtSearch.getText();
+        List<SalaryDTO> foundList = salaryBUS.searchByNameAndAmount(keyword);
+        if (!foundList.isEmpty()) {
+            loadDataToTable(foundList);
+        } else {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
+        // TODO add your handling code here:
+        // filter 
+        int month = (int) cbbMonth.getSelectedItem();
+        int year = (int) cbbYear.getSelectedItem();
+        List<SalaryDTO> foundList = salaryBUS.getByMonthYear(month, year);
+        if (!foundList.isEmpty()) {
+            loadDataToTable(foundList);
+        } else {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+        }
+    }//GEN-LAST:event_btnFilterActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd4;
-    private javax.swing.JButton btnDel;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnExport;
     private javax.swing.JButton btnFilter;
     private javax.swing.JButton btnImport;
-    private javax.swing.JComboBox<String> cbbMonth;
-    private javax.swing.JComboBox<String> cbbYear;
+    private javax.swing.JComboBox<Integer> cbbMonth;
+    private javax.swing.JComboBox<Integer> cbbYear;
     private javax.swing.JPanel headPanel;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;

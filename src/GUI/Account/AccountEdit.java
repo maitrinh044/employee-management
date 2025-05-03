@@ -50,7 +50,6 @@ public class AccountEdit extends javax.swing.JFrame {
         }
         
         setLocationRelativeTo(null);
-
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 

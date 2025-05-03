@@ -8,13 +8,13 @@ package DAO;
  *
  * @author MaiTrinh
  */
-
 import DTO.SalaryDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SalaryDAO {
+
     private final DatabaseConnect dbConnect;
 
     public SalaryDAO() {
@@ -23,17 +23,15 @@ public class SalaryDAO {
 
     public List<SalaryDTO> getAll() {
         List<SalaryDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM salary WHERE status = true";
-        try (Connection conn = dbConnect.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        String sql = "SELECT * FROM salarys WHERE status = true";
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 SalaryDTO s = new SalaryDTO();
                 s.setSalaryId(rs.getInt("salary_id"));
                 s.setEmployeeId(rs.getInt("employee_id"));
                 s.setMonth(rs.getInt("month"));
                 s.setYear(rs.getInt("year"));
-                s.setSalaryAmount(rs.getInt("total_salary"));
+                s.setSalaryAmount(rs.getInt("salary_amount"));
                 s.setStatus(rs.getBoolean("status"));
                 list.add(s);
             }
@@ -43,10 +41,30 @@ public class SalaryDAO {
         return list;
     }
 
+    public SalaryDTO getById(int id) {
+        SalaryDTO s = new SalaryDTO();
+        String sql = "SELECT * FROM salarys WHERE salary_id = ?";
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                s.setSalaryId(rs.getInt("salary_id"));
+                s.setEmployeeId(rs.getInt("employee_id"));
+                s.setMonth(rs.getInt("month"));
+                s.setYear(rs.getInt("year"));
+                s.setSalaryAmount(rs.getInt("salary_amount"));
+                s.setStatus(rs.getBoolean("status"));
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
+
     public boolean add(SalaryDTO s) {
-        String sql = "INSERT INTO salary (employee_id, month, year, total_salary, status) VALUES (?, ?, ?, ?, true)";
-        try (Connection conn = dbConnect.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "INSERT INTO salarys (employee_id, month, year, salary_amount, status) VALUES (?, ?, ?, ?, true)";
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, s.getEmployeeId());
             stmt.setInt(2, s.getMonth());
             stmt.setInt(3, s.getYear());
@@ -60,9 +78,8 @@ public class SalaryDAO {
     }
 
     public boolean update(SalaryDTO s) {
-        String sql = "UPDATE salary SET employee_id = ?, month = ?, year = ?, total_salary = ?, status = ? WHERE salary_id = ?";
-        try (Connection conn = dbConnect.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "UPDATE salarys SET employee_id = ?, month = ?, year = ?, salary_amount = ?, status = ? WHERE salary_id = ?";
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, s.getEmployeeId());
             stmt.setInt(2, s.getMonth());
             stmt.setInt(3, s.getYear());
@@ -79,8 +96,7 @@ public class SalaryDAO {
 
     public boolean updateStatus(int id, boolean status) {
         String sql = "UPDATE salary SET status = ? WHERE salary_id = ?";
-        try (Connection conn = dbConnect.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setBoolean(1, status);
             stmt.setInt(2, id);
             stmt.executeUpdate();
@@ -90,12 +106,11 @@ public class SalaryDAO {
         }
         return false;
     }
-    
+
     public List<SalaryDTO> getByEmployeeId(int employeeId) {
         List<SalaryDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM salary WHERE employee_id = ? AND status = true";
-        try (Connection conn = dbConnect.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "SELECT * FROM salarys WHERE employee_id = ? AND status = true";
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, employeeId);
             ResultSet rs = stmt.executeQuery();
@@ -118,13 +133,12 @@ public class SalaryDAO {
 
         return list;
     }
-    
+
     public List<SalaryDTO> getByMonthYear(int month, int year) {
         List<SalaryDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM salary WHERE month = ? AND year = ? AND status = true";
+        String sql = "SELECT * FROM salarys WHERE month = ? AND year = ? AND status = true";
 
-        try (Connection conn = dbConnect.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, month);
             stmt.setInt(2, year);
@@ -151,10 +165,9 @@ public class SalaryDAO {
 
     public List<SalaryDTO> getByEmployeeAndMonthYear(int employeeId, int month, int year) {
         List<SalaryDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM salary WHERE employee_id = ? AND month = ? AND year = ? AND status = true";
+        String sql = "SELECT * FROM salarys WHERE employee_id = ? AND month = ? AND year = ? AND status = true";
 
-        try (Connection conn = dbConnect.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, employeeId);
             stmt.setInt(2, month);
@@ -170,6 +183,60 @@ public class SalaryDAO {
                 salary.setYear(rs.getInt("year"));
                 salary.setStatus(rs.getBoolean("status"));
 
+                list.add(salary);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<Integer> getAllYear() {
+        List<Integer> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT year AS year FROM salarys ORDER BY year DESC";
+
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(rs.getInt("year"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<SalaryDTO> searchByNameAndAmount(String keyword) {
+        List<SalaryDTO> list = new ArrayList<>();
+        String sql = "SELECT s.* FROM salarys s "
+                + "JOIN employees e ON s.employee_id = e.employee_id "
+                + "WHERE e.full_name LIKE ? OR s.salary_amount = ?";
+
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, "%" + keyword + "%");
+            int salaryAmount;
+            try {
+                salaryAmount = Integer.parseInt(keyword);
+            } catch (NumberFormatException e) {
+                salaryAmount = -1; // giá trị không khớp nào
+            }
+            stmt.setInt(2, salaryAmount);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                SalaryDTO salary = new SalaryDTO();
+                salary.setSalaryId(rs.getInt("salary_id"));
+                salary.setEmployeeId(rs.getInt("employee_id"));
+                salary.setSalaryAmount(rs.getInt("salary_amount"));
+                salary.setMonth(rs.getInt("month"));
+                salary.setYear(rs.getInt("year"));
+                salary.setStatus(rs.getBoolean("status"));
                 list.add(salary);
             }
 

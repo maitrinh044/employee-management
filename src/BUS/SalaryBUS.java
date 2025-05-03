@@ -30,6 +30,10 @@ public class SalaryBUS {
     public List<SalaryDTO> getAllSalaries() {
         return salaryDAO.getAll();
     }
+    
+    public SalaryDTO getById(int id) {
+        return salaryDAO.getById(id);
+    }
 
     // Thêm bản ghi lương mới
     public boolean addSalary(SalaryDTO salary) {
@@ -64,6 +68,14 @@ public class SalaryBUS {
     
     public List<SalaryDTO> getByMonthYear(int month, int year) {
         return salaryDAO.getByMonthYear(month, year);
+    }
+    
+    public List<Integer> getAllYear() {
+        return salaryDAO.getAllYear();
+    }
+    
+    public List<SalaryDTO> searchByNameAndAmount(String keyword) {
+        return salaryDAO.searchByNameAndAmount(keyword);
     }
     
     // Tính lương của nhân viên theo employeeId trong tháng và năm

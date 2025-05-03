@@ -4,6 +4,8 @@
  */
 package DTO;
 
+import java.sql.Date;
+
 /**
  *
  * @author MaiTrinh
@@ -11,7 +13,7 @@ package DTO;
 public class RewardDTO {
     private int rewardId;
     private int employeeId;
-    private String rewardDate;
+    private Date rewardDate;
     private int rewardValue;
     private String description;
     boolean status;
@@ -19,7 +21,7 @@ public class RewardDTO {
     public RewardDTO() {
     }
 
-    public RewardDTO(int rewardId, int employeeId, String rewardDate, int rewardValue, String description, boolean status) {
+    public RewardDTO(int rewardId, int employeeId, Date rewardDate, int rewardValue, String description, boolean status) {
         this.rewardId = rewardId;
         this.employeeId = employeeId;
         this.rewardDate = rewardDate;
@@ -48,11 +50,11 @@ public class RewardDTO {
         this.employeeId = employeeId;
     }
 
-    public String getRewardDate() {
+    public Date getRewardDate() {
         return rewardDate;
     }
 
-    public void setRewardDate(String rewardDate) {
+    public void setRewardDate(Date rewardDate) {
         this.rewardDate = rewardDate;
     }
 

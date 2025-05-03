@@ -296,8 +296,13 @@ public class AccountContentPanel extends javax.swing.JPanel {
         addFrame = new AccountAdd();
         addFrame.setTitle("Thêm tài khoản");
         addFrame.setVisible(true);
-        accountList = accountBUS.getAllAccounts();
-        loadDataToTable(accountList);
+        addFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                accountList = accountBUS.getAllAccounts();
+                loadDataToTable(accountList);
+            }
+        });
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
@@ -327,7 +332,6 @@ public class AccountContentPanel extends javax.swing.JPanel {
         String keyword = txtSearch.getText();
         List<AccountDTO> foundAccountList = accountBUS.searchAccountByUsername(keyword);
         if (!foundAccountList.isEmpty()) {
-            System.out.println("aadadw");
             loadDataToTable(foundAccountList);
         } else {
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel();

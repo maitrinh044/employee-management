@@ -25,6 +25,10 @@ public class RewardBUS {
     public List<RewardDTO> getAllRewards() {
         return rewardDAO.getAll();
     }
+    
+    public RewardDTO getById(int id) {
+        return rewardDAO.getById(id);
+    }
 
     // Thêm thưởng cho nhân viên
     public boolean addReward(RewardDTO reward) {
@@ -34,6 +38,10 @@ public class RewardBUS {
             return false;
         }
         return rewardDAO.add(reward);
+    }
+    
+    public boolean updateReward(RewardDTO reward) {
+        return rewardDAO.update(reward);
     }
 
     // Cập nhật trạng thái thưởng
@@ -54,5 +62,9 @@ public class RewardBUS {
     // Lấy tổng số thưởng của nhân viên trong tháng
     public int getTotalRewardForEmployeeInMonth(int employeeId, int month, int year) {
         return rewardDAO.getTotalRewardForEmployeeInMonth(employeeId, month, year);
+    }
+    
+    public List<RewardDTO> searchByNameAndAmount(String keyword) {
+        return rewardDAO.searchByNameAndAmount(keyword);
     }
 }
