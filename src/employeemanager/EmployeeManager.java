@@ -4,7 +4,7 @@
  */
 package employeemanager;
 
-import GUI.Main;
+import GUI.Auth.LoginForm;
 
 /**
  *
@@ -17,7 +17,7 @@ public class EmployeeManager {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        new Main();
+        new LoginForm();
     }
     
 }

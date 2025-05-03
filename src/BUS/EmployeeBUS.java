@@ -52,6 +52,14 @@ public class EmployeeBUS {
     public List<EmployeeDTO> searchEmployees(String keyword) {
         return employeeDAO.search(keyword);
     }
+    
+    public List<EmployeeDTO> getEmplNotAccount() {
+        return employeeDAO.getEmplNotAccount();
+    }
+    
+    public EmployeeDTO getById(int id) {
+        return employeeDAO.getEmployeeById(id);
+    }
 
 }
 

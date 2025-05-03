@@ -118,6 +118,36 @@ public class SalaryDAO {
 
         return list;
     }
+    
+    public List<SalaryDTO> getByMonthYear(int month, int year) {
+        List<SalaryDTO> list = new ArrayList<>();
+        String sql = "SELECT * FROM salary WHERE month = ? AND year = ? AND status = true";
+
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, month);
+            stmt.setInt(2, year);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                SalaryDTO salary = new SalaryDTO();
+                salary.setSalaryId(rs.getInt("salary_id"));
+                salary.setEmployeeId(rs.getInt("employee_id"));
+                salary.setSalaryAmount(rs.getInt("salary_amount"));
+                salary.setMonth(rs.getInt("month"));
+                salary.setYear(rs.getInt("year"));
+                salary.setStatus(rs.getBoolean("status"));
+
+                list.add(salary);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 
     public List<SalaryDTO> getByEmployeeAndMonthYear(int employeeId, int month, int year) {
         List<SalaryDTO> list = new ArrayList<>();

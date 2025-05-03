@@ -4,19 +4,167 @@
  */
 package GUI.Project;
 
+import BUS.ProjectBUS;
+import DTO.ProjectDTO;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 /**
  *
- * @author MaiTrinh
+ * @author duyen
  */
 public class ProjectContentPanel extends javax.swing.JPanel {
-
+    private final ProjectBUS projectBUS = new ProjectBUS();
+    private final DefaultTableModel tableModel;
+    private JDialog addEditDialog;
+    private JTextField txtProjectName;
+    private JTextField txtStartDate;
+    private JTextField txtEndDate;
+    private JTextField txtManagerId;
+    private JCheckBox chkStatus;
+    
+    /**
+     * Creates new form ProjectContentPanel
+     */
     /**
      * Creates new form ProjectContentPanel
      */
     public ProjectContentPanel() {
         initComponents();
+        tableModel = (DefaultTableModel) jTable1.getModel();
+        loadProjectData();
+        btnAdd.addActionListener(e -> showAddEditDialog(null));
+        btnEdit.addActionListener(e -> showEditDialog());
+        btnDel.addActionListener(e -> deleteSelectedProject());
+        jButton1.addActionListener(e -> searchProjects());
+    }
+    @SuppressWarnings("empty-statement")
+    private void loadProjectData() {
+        tableModel.setRowCount(0);
+        List<ProjectDTO> projects = projectBUS.getAllProjects();
+        for (ProjectDTO project : projects) {
+            tableModel.addRow(new Object[]{
+                project.getProjectId(),
+                project.getProjectName(),
+                project.getStartDate(),
+                project.getEndDate(),
+                project.getManagerId(),
+                project.getStatus()
+            });
+        }
     }
 
+    private void showAddEditDialog(ProjectDTO projectToEdit) {
+        addEditDialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this),
+                projectToEdit == null ? "Thêm Dự Án" : "Sửa Dự Án", true);
+        addEditDialog.setLayout(new GridLayout(6, 2, 5, 5));
+
+        txtProjectName = new JTextField(projectToEdit == null ? "" : projectToEdit.getProjectName());
+        txtStartDate = new JTextField(projectToEdit == null ? "" : projectToEdit.getStartDate());
+        txtEndDate = new JTextField(projectToEdit == null ? "" : projectToEdit.getEndDate());
+        txtManagerId = new JTextField(projectToEdit == null ? "" : String.valueOf(projectToEdit.getManagerId()));
+        chkStatus = new JCheckBox("Đang hoạt động", projectToEdit == null ? true : projectToEdit.getStatus());
+
+        addEditDialog.add(new JLabel("Tên dự án:"));
+        addEditDialog.add(txtProjectName);
+        addEditDialog.add(new JLabel("Ngày bắt đầu:"));
+        addEditDialog.add(txtStartDate);
+        addEditDialog.add(new JLabel("Ngày kết thúc:"));
+        addEditDialog.add(txtEndDate);
+        addEditDialog.add(new JLabel("ID quản lý:"));
+        addEditDialog.add(txtManagerId);
+        addEditDialog.add(new JLabel("Trạng thái:"));
+        addEditDialog.add(chkStatus);
+
+        JButton saveButton = new JButton("Lưu");
+        saveButton.addActionListener(e -> {
+            ProjectDTO newProject = new ProjectDTO();
+            newProject.setProjectName(txtProjectName.getText());
+            newProject.setStartDate(txtStartDate.getText());
+            newProject.setEndDate(txtEndDate.getText());
+            try {
+                newProject.setManagerId(Integer.parseInt(txtManagerId.getText()));
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(addEditDialog, "ID quản lý phải là số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            newProject.setStatus(chkStatus.isSelected());
+
+            boolean result;
+            if (projectToEdit == null) {
+                result = projectBUS.addProject(newProject);
+            } else {
+                newProject.setProjectId(projectToEdit.getProjectId());
+                result = projectBUS.updateProject(newProject);
+            }
+
+            if (result) {
+                loadProjectData();
+                addEditDialog.dispose();
+            } else {
+                JOptionPane.showMessageDialog(addEditDialog, "Thao tác thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        addEditDialog.add(new JLabel("")); // Placeholder for layout
+        addEditDialog.add(saveButton);
+
+        addEditDialog.pack();
+        addEditDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
+        addEditDialog.setVisible(true);
+    }
+
+    private void showEditDialog() {
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow >= 0) {
+            int projectId = (int) tableModel.getValueAt(selectedRow, 0);
+            ProjectDTO projectToEdit = projectBUS.getProjectById(projectId); // Cần triển khai getProjectById trong BUS
+            if (projectToEdit != null) {
+                showAddEditDialog(projectToEdit);// Sử dụng lại dialog thêm/sửa
+            } else {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy dự án.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một dự án để sửa.", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void deleteSelectedProject() {
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow >= 0) {
+            int projectId = (int) tableModel.getValueAt(selectedRow, 0);
+            int option = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                if (projectBUS.deleteProject(projectId)) {
+                    loadProjectData();
+                    JOptionPane.showMessageDialog(this, "Đã xóa thành công.");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Xóa thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một dự án để xóa.", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void searchProjects() {
+        String keyword = txtSearch.getText();
+        String searchBy = (String) jComboBox1.getSelectedItem();
+        List<ProjectDTO> searchResults = projectBUS.searchProjects(keyword, searchBy);
+        tableModel.setRowCount(0);
+        for (ProjectDTO project : searchResults) {
+            tableModel.addRow(new Object[]{
+                project.getProjectId(),
+                project.getProjectName(),
+                project.getStartDate(),
+                project.getEndDate(),
+                project.getManagerId(),
+                project.getStatus()
+            });
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -26,6 +174,16 @@ public class ProjectContentPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuBar2 = new javax.swing.JMenuBar();
+        jMenu3 = new javax.swing.JMenu();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuBar3 = new javax.swing.JMenuBar();
+        jMenu5 = new javax.swing.JMenu();
+        jMenu6 = new javax.swing.JMenu();
+        jMenu7 = new javax.swing.JMenu();
         headPanel9 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -40,6 +198,26 @@ public class ProjectContentPanel extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+
+        jMenu1.setText("File");
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
+
+        jMenu3.setText("File");
+        jMenuBar2.add(jMenu3);
+
+        jMenu4.setText("Edit");
+        jMenuBar2.add(jMenu4);
+
+        jMenu5.setText("File");
+        jMenuBar3.add(jMenu5);
+
+        jMenu6.setText("Edit");
+        jMenuBar3.add(jMenu6);
+
+        jMenu7.setText("jMenu7");
 
         setPreferredSize(new java.awt.Dimension(1200, 700));
 
@@ -183,13 +361,16 @@ public class ProjectContentPanel extends javax.swing.JPanel {
         jTable1.setForeground(new java.awt.Color(255, 255, 255));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "project_id", "project_name", "start_date", "end_date", "manager_id", "status"
             }
         ));
         jTable1.setAlignmentX(0.0F);
@@ -202,6 +383,7 @@ public class ProjectContentPanel extends javax.swing.JPanel {
         jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTable1.setShowGrid(false);
         jScrollPane1.setViewportView(jTable1);
+        jTable1.getAccessibleContext().setAccessibleParent(jTable1);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -262,6 +444,16 @@ public class ProjectContentPanel extends javax.swing.JPanel {
     private javax.swing.JPanel headPanel9;
     private javax.swing.JButton jButton1;
     private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
+    private javax.swing.JMenu jMenu7;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuBar jMenuBar2;
+    private javax.swing.JMenuBar jMenuBar3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

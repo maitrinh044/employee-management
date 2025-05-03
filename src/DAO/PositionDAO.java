@@ -25,7 +25,7 @@ public class PositionDAO {
     // Lấy tất cả các vị trí
     public List<PositionDTO> getAllPositions() {
         List<PositionDTO> positionList = new ArrayList<>();
-        String sql = "SELECT * FROM position";
+        String sql = "SELECT * FROM positions";
 
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -50,7 +50,7 @@ public class PositionDAO {
     // Lấy vị trí theo ID
     public PositionDTO getPositionById(int positionId) {
         PositionDTO position = null;
-        String sql = "SELECT * FROM position WHERE position_id = ?";
+        String sql = "SELECT * FROM positions WHERE position_id = ?";
 
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -76,7 +76,7 @@ public class PositionDAO {
 
     // Cập nhật thông tin vị trí
     public boolean updatePosition(PositionDTO position) {
-        String sql = "UPDATE position SET position_name = ?, base_salary = ?, status = ? WHERE position_id = ?";
+        String sql = "UPDATE positions SET position_name = ?, base_salary = ?, status = ? WHERE position_id = ?";
         boolean success = false;
 
         try (Connection conn = dbConnect.getConnection();
@@ -97,7 +97,7 @@ public class PositionDAO {
 
     // Thêm mới vị trí
     public boolean addPosition(PositionDTO position) {
-        String sql = "INSERT INTO position (position_name, base_salary, status) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO positions (position_name, base_salary, status) VALUES (?, ?, ?)";
 
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -118,7 +118,7 @@ public class PositionDAO {
 
     // Cập nhật trạng thái vị trí
     public boolean updatePositionStatus(int positionId, boolean status) {
-        String sql = "UPDATE position SET status = ? WHERE position_id = ?";
+        String sql = "UPDATE positions SET status = ? WHERE position_id = ?";
 
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -139,7 +139,7 @@ public class PositionDAO {
     // Tìm kiếm vị trí theo tên
     public List<PositionDTO> search(String keyword) {
         List<PositionDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM position WHERE position_name LIKE ? AND status = true";
+        String sql = "SELECT * FROM positions WHERE position_name LIKE ? AND status = true";
         try (Connection conn = dbConnect.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, "%" + keyword + "%");
@@ -162,8 +162,8 @@ public class PositionDAO {
     public PositionDTO getPositionByEmployeeId(int employeeId) {
         PositionDTO position = null;
         String sql = "SELECT p.position_id, p.position_name, p.base_salary, p.status " +
-                     "FROM position p " +
-                     "JOIN employee e ON p.position_id = e.position_id " +
+                     "FROM positions p " +
+                     "JOIN employees e ON p.position_id = e.position_id " +
                      "WHERE e.employee_id = ?";
         
         try (Connection conn = dbConnect.getConnection();

@@ -6,12 +6,13 @@ package BUS;
 
 /**
  *
- * @author MaiTrinh
+ * @author duyen
  */
 
 import DAO.ProjectDAO;
 import DTO.ProjectDTO;
 import java.util.List;
+import java.util.ArrayList;
 
 public class ProjectBUS {
     private final ProjectDAO projectDAO;
@@ -20,7 +21,7 @@ public class ProjectBUS {
         projectDAO = new ProjectDAO();
     }
 
-    // Lấy tất cả dự án
+    // Lấy tất cả dự án đang hoạt động
     public List<ProjectDTO> getAllProjects() {
         return projectDAO.getAll();
     }
@@ -37,19 +38,17 @@ public class ProjectBUS {
         return projectDAO.update(project);
     }
 
-    // Cập nhật trạng thái (ẩn/xóa mềm)
-    public boolean updateProjectStatus(int id, boolean status) {
+    // Xóa dự án (Ẩn dự án bằng Cập nhật trạng thái)
+    public boolean deleteProject(int id)  {
         if (id <= 0) {
             System.out.println("ID dự án không hợp lệ");
             return false;
         }
-        return projectDAO.updateStatus(id, status);
+        return projectDAO.updateStatus(id,false);
     }
 
-//    // Tìm kiếm theo từ khóa
-//    public List<ProjectDTO> searchProjects(String keyword) {
-//        return projectDAO.search(keyword);
-//    }
+    
+    
 
     private boolean isValidProject(ProjectDTO project, boolean isUpdate) {
         if (project == null) {
@@ -66,10 +65,12 @@ public class ProjectBUS {
             System.out.println("Tên dự án không được để trống");
             return false;
         }
-
-        if (project.getStartDate() == null || project.getEndDate() == null ||
-            project.getStartDate().trim().isEmpty() || project.getEndDate().trim().isEmpty()) {
-            System.out.println("Ngày bắt đầu/kết thúc không được để trống");
+        if (project.getStartDate() == null || project.getStartDate().trim().isEmpty()) {
+            System.out.println("Ngày bắt đầu không được để trống");
+            return false;
+        }
+        if (project.getEndDate() == null || project.getEndDate().trim().isEmpty()) {
+            System.out.println("Ngày kết thúc không được để trống");
             return false;
         }
 
@@ -79,6 +80,52 @@ public class ProjectBUS {
         }
 
         return true;
+    }
+
+
+    public List<ProjectDTO> searchProjects(String keyword, String searchBy) {
+        List<ProjectDTO> allProjects = projectDAO.getAll();
+        List<ProjectDTO> searchResults = new ArrayList<>();
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return allProjects;
+        }
+
+        keyword = keyword.trim().toLowerCase();
+
+        for (ProjectDTO project : allProjects) {
+            switch (searchBy) {
+                case "Theo tên" -> {
+                    if (project.getProjectName().toLowerCase().contains(keyword)) {
+                        searchResults.add(project);
+                    }
+                }
+                case "Theo ID quản lý" -> {
+                    try {
+                        int managerId = Integer.parseInt(keyword);
+                        if (project.getManagerId() == managerId) {
+                            searchResults.add(project);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Lỗi: Từ khóa không phải là số hợp lệ cho ID quản lý.");
+                    }
+                }
+                default -> {
+                    if (project.getProjectName().toLowerCase().contains(keyword)) {
+                        searchResults.add(project);
+                    }
+                }
+            }
+        }
+        return searchResults;
+    }
+
+    public ProjectDTO getProjectById(int projectId) {
+        if (projectId <= 0) {
+            System.out.println("ID dự án không hợp lệ");
+            return null; // Hoặc throw một exception nếu bạn thích
+        }
+        return projectDAO.getProjectById(projectId);
     }
 }
 

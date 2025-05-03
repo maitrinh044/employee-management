@@ -56,5 +56,9 @@ public class DepartmentBUS {
 //    public List<DepartmentDTO> searchDepartments(String keyword) {
 //        return departmentDAO.search(keyword);
 //    }
+    
+    public DepartmentDTO getById(int id) {
+        return departmentDAO.getById(id);
+    }
 }
 

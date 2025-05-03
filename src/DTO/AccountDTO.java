@@ -14,6 +14,7 @@ public class AccountDTO {
     private int accountId;
     private int employeeId;
     private String username;
+    private String password;
     private int roleId;
     private Timestamp createdAt;
     private boolean status;
@@ -21,10 +22,11 @@ public class AccountDTO {
     public AccountDTO() {
     }
 
-    public AccountDTO(int accountId, int employeeId, String username, int roleId, Timestamp createdAt, boolean status) {
+    public AccountDTO(int accountId, int employeeId, String username, String password, int roleId, Timestamp createdAt, boolean status) {
         this.accountId = accountId;
         this.employeeId = employeeId;
         this.username = username;
+        this.password = password;
         this.roleId = roleId;
         this.createdAt = createdAt;
         this.status = status;
@@ -34,6 +36,7 @@ public class AccountDTO {
         this.accountId = accountDTO.accountId;
         this.employeeId = accountDTO.employeeId;
         this.username = accountDTO.username;
+        this.password = accountDTO.password;
         this.roleId = accountDTO.roleId;
         this.createdAt = accountDTO.createdAt;
         this.status = accountDTO.status;
@@ -61,6 +64,14 @@ public class AccountDTO {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String pass) {
+        this.password = pass;
     }
 
     public int getRoleId() {

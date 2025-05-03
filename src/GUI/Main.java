@@ -8,6 +8,7 @@ package GUI;
  *
  * @author MaiTrinh
  */
+import DTO.AccountDTO;
 import GUI.Reward.RewardContentPanel;
 import GUI.Discipline.DisciplineContentPanel;
 import GUI.Salary.SalaryContentPanel;
@@ -15,6 +16,8 @@ import GUI.Project.ProjectContentPanel;
 import GUI.Department.DepartmentContentPanel;
 import GUI.Employee.EmployeeContentPanel;
 import GUI.Account.AccountContentPanel;
+import GUI.Auth.LoginForm;
+import GUI.Profile.ProfileContentPanel;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
@@ -24,6 +27,7 @@ import javax.swing.*;
 public class Main extends javax.swing.JFrame implements MouseListener {
 
     private JLabel selectedMenuItem = null;
+    private ProfileContentPanel profileContentPanel;
     private EmployeeContentPanel employeeContentPanel;
     private DepartmentContentPanel departmentContentPanel;
     private ProjectContentPanel projectContentPanel;
@@ -32,14 +36,16 @@ public class Main extends javax.swing.JFrame implements MouseListener {
     private DisciplineContentPanel discplContentPanel;
     private StatisticContentPanel statsContentPanel;
     private AccountContentPanel accountContentPanel;
+    
 
     private Map<JLabel, JPanel> labelPanelMap = new HashMap<>();
 
     /**
      * Creates new form MainForm
      */
-    public Main() {
+    public Main(AccountDTO user) {
         initComponents();
+        profileContentPanel = new ProfileContentPanel(user);
         employeeContentPanel = new EmployeeContentPanel();
         departmentContentPanel = new DepartmentContentPanel();
         projectContentPanel = new ProjectContentPanel();
@@ -61,8 +67,12 @@ public class Main extends javax.swing.JFrame implements MouseListener {
         statsLabel.addMouseListener(this);
         accountLabel.addMouseListener(this);
 
+        logoutLabel.addMouseListener(this);
+
         contentPanel.setLayout(new BorderLayout());
         setResizable(false);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
     }
 
@@ -91,6 +101,7 @@ public class Main extends javax.swing.JFrame implements MouseListener {
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Quản lý nhân viên");
         setMinimumSize(new java.awt.Dimension(1400, 730));
         setPreferredSize(new java.awt.Dimension(1400, 730));
         setResizable(false);
@@ -277,8 +288,8 @@ public class Main extends javax.swing.JFrame implements MouseListener {
      * @param args the command line arguments
      */
     private void initMenu() {
-        labelPanelMap.put(profileLabel, null); // Không có panel cụ thể
 
+        labelPanelMap.put(profileLabel, profileContentPanel);
         labelPanelMap.put(staffLabel, employeeContentPanel);
         labelPanelMap.put(departmentLabel, departmentContentPanel);
         labelPanelMap.put(projectLabel, projectContentPanel);
@@ -293,6 +304,12 @@ public class Main extends javax.swing.JFrame implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         JLabel clickedLabel = (JLabel) e.getSource();
+        if (clickedLabel == logoutLabel) {
+            JOptionPane.showMessageDialog(null, "Đăng xuất thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+            LoginForm loginForm = new LoginForm();
+
+        }
 
         // Reset background của label trước đó
         if (selectedMenuItem != null) {

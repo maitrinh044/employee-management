@@ -62,6 +62,10 @@ public class SalaryBUS {
         return salaryDAO.getByEmployeeAndMonthYear(employeeId, month, year);
     }
     
+    public List<SalaryDTO> getByMonthYear(int month, int year) {
+        return salaryDAO.getByMonthYear(month, year);
+    }
+    
     // Tính lương của nhân viên theo employeeId trong tháng và năm
     public int calculateSalary(int employeeId, int month, int year) {
         // Lấy thông tin vị trí của nhân viên từ PositionBUS

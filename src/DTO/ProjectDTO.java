@@ -6,7 +6,7 @@ package DTO;
 
 /**
  *
- * @author MaiTrinh
+ * @author duyen
  */
 public class ProjectDTO {
     private int projectId;

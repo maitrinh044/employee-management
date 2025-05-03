@@ -20,19 +20,21 @@ import javax.swing.table.DefaultTableModel;
 public class AccountContentPanel extends javax.swing.JPanel {
 
     private List<AccountDTO> accountList;
+    private AccountBUS accountBUS;
     private AccountAdd addFrame;
+    private AccountEdit editFrame;
 
     /**
      * Creates new form AccountContentPanel
      */
     public AccountContentPanel() {
         initComponents();
-        AccountBUS accBus = new AccountBUS();
-        accountList = accBus.getAllAccounts();
-        loadDataToTable();
+        accountBUS = new AccountBUS();
+        accountList = accountBUS.getAllAccounts();
+        loadDataToTable(accountList);
     }
 
-    public void loadDataToTable() {
+    public void loadDataToTable(List<AccountDTO> accountList) {
         RoleBUS roleBUS = new RoleBUS();
         String[] columnNames = {"STT", "Mã nhân viên", "Tên người dùng", "Phân quyền", "Trạng thái"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
@@ -76,7 +78,6 @@ public class AccountContentPanel extends javax.swing.JPanel {
         btnExport = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
         txtSearch = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -122,6 +123,11 @@ public class AccountContentPanel extends javax.swing.JPanel {
         btnDel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/remove.png"))); // NOI18N
         btnDel.setText("Xóa");
         btnDel.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnDel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDelActionPerformed(evt);
+            }
+        });
 
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/excel.png"))); // NOI18N
@@ -139,6 +145,11 @@ public class AccountContentPanel extends javax.swing.JPanel {
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/edit.png"))); // NOI18N
         btnEdit.setText("Sửa");
         btnEdit.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -173,15 +184,6 @@ public class AccountContentPanel extends javax.swing.JPanel {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Tìm kiếm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
         jPanel1.setPreferredSize(new java.awt.Dimension(1000, 100));
 
-        jComboBox1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Theo tên", "Theo mã" }));
-        jComboBox1.setMinimumSize(new java.awt.Dimension(75, 25));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
-
         txtSearch.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtSearch.setPreferredSize(new java.awt.Dimension(75, 25));
         txtSearch.setVerifyInputWhenFocusTarget(false);
@@ -192,6 +194,11 @@ public class AccountContentPanel extends javax.swing.JPanel {
         jButton1.setMaximumSize(new java.awt.Dimension(75, 25));
         jButton1.setMinimumSize(new java.awt.Dimension(75, 25));
         jButton1.setPreferredSize(new java.awt.Dimension(75, 25));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -199,9 +206,7 @@ public class AccountContentPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 678, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 814, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
@@ -211,8 +216,7 @@ public class AccountContentPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
@@ -290,12 +294,61 @@ public class AccountContentPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         // Thêm
         addFrame = new AccountAdd();
+        addFrame.setTitle("Thêm tài khoản");
         addFrame.setVisible(true);
+        accountList = accountBUS.getAllAccounts();
+        loadDataToTable(accountList);
     }//GEN-LAST:event_btnAddActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+        // edit
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow >= 0) {
+            // Lấy dữ liệu từ các cột
+            int id = (int) jTable1.getValueAt(selectedRow, 0);
+            AccountDTO existAccount = accountBUS.getById(id);
+
+            // Truyền sang Frame sửa
+            editFrame = new AccountEdit(existAccount);
+            editFrame.setTitle("Sửa thông tin tài khoản");
+            editFrame.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(null, "Vui lòng chọn một tài khoản để sửa thông tin", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        }
+
+        accountList = accountBUS.getAllAccounts();
+        loadDataToTable(accountList);
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        // search
+        String keyword = txtSearch.getText();
+        List<AccountDTO> foundAccountList = accountBUS.searchAccountByUsername(keyword);
+        if (!foundAccountList.isEmpty()) {
+            System.out.println("aadadw");
+            loadDataToTable(foundAccountList);
+        } else {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow >= 0) {
+            // Lấy dữ liệu từ các cột
+            int id = (int) jTable1.getValueAt(selectedRow, 0);
+            AccountDTO existAccount = accountBUS.getById(id);
+            accountBUS.updateAccountStatus(existAccount.getAccountId(), false);
+        } else {
+            JOptionPane.showMessageDialog(null, "Vui lòng chọn một tài khoản để thay đổi trạng thái", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        }
+        accountList = accountBUS.getAllAccounts();
+        loadDataToTable(accountList);
+    }//GEN-LAST:event_btnDelActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -306,7 +359,6 @@ public class AccountContentPanel extends javax.swing.JPanel {
     private javax.swing.JButton btnImport;
     private javax.swing.JPanel headPanel;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

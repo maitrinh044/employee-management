@@ -18,14 +18,14 @@ DROP TABLE IF EXISTS roles;
 
 -- Create roles table
 CREATE TABLE roles (
-  role_id INT PRIMARY KEY,
+  role_id INT AUTO_INCREMENT PRIMARY KEY,
   role_name VARCHAR(255),
   status INT DEFAULT 1
 );
 
 -- Create positions table
 CREATE TABLE positions (
-  position_id INT PRIMARY KEY,
+  position_id INT AUTO_INCREMENT PRIMARY KEY,
   position_name VARCHAR(255),
   base_salary INT,
   status INT DEFAULT 1
@@ -33,7 +33,7 @@ CREATE TABLE positions (
 
 -- Create departments table
 CREATE TABLE departments (
-  department_id INT PRIMARY KEY,
+  department_id INT AUTO_INCREMENT PRIMARY KEY,
   department_name VARCHAR(255),
   manager_id INT UNIQUE,
   status INT DEFAULT 1,
@@ -42,7 +42,7 @@ CREATE TABLE departments (
 
 -- Create employees table
 CREATE TABLE employees (
-  employee_id INT PRIMARY KEY,
+  employee_id INT AUTO_INCREMENT PRIMARY KEY,
   full_name VARCHAR(255),
   birthday DATE,
   gender ENUM('Male', 'Female', 'Other'),
@@ -57,9 +57,10 @@ CREATE TABLE employees (
 
 -- Create accounts table
 CREATE TABLE accounts (
-  account_id INT PRIMARY KEY,
+  account_id INT AUTO_INCREMENT PRIMARY KEY,
   employee_id INT UNIQUE,
   username VARCHAR(255),
+  password VARCHAR(255),
   role_id INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   status INT DEFAULT 1,
@@ -69,7 +70,7 @@ CREATE TABLE accounts (
 
 -- Create salarys table
 CREATE TABLE salarys (
-  salary_id INT PRIMARY KEY,
+  salary_id INT AUTO_INCREMENT PRIMARY KEY,
   employee_id INT,
   salary_amount INT,
   month DATE,
@@ -79,7 +80,7 @@ CREATE TABLE salarys (
 
 -- Create projects table
 CREATE TABLE projects (
-  project_id INT PRIMARY KEY,
+  project_id INT AUTO_INCREMENT PRIMARY KEY,
   project_name VARCHAR(255),
   start_date DATE,
   end_date DATE,
@@ -103,7 +104,7 @@ CREATE TABLE project_employee (
 
 -- Create rewards table
 CREATE TABLE rewards (
-  reward_id INT PRIMARY KEY,
+  reward_id INT AUTO_INCREMENT PRIMARY KEY,
   employee_id INT,
   reward_date DATE,
   reward_value INT,
@@ -114,7 +115,7 @@ CREATE TABLE rewards (
 
 -- Create discipline table
 CREATE TABLE discipline (
-  discipline_id INT PRIMARY KEY,
+  discipline_id INT AUTO_INCREMENT PRIMARY KEY,
   employee_id INT,
   discipline_type VARCHAR(255),
   discipline_amount INT,

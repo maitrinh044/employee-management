@@ -8,13 +8,14 @@ package BUS;
  *
  * @author MaiTrinh
  */
-
 import DAO.AccountDAO;
 import DTO.AccountDTO;
 
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class AccountBUS {
+
     private final AccountDAO accountDAO;
 
     public AccountBUS() {
@@ -52,7 +53,12 @@ public class AccountBUS {
     }
 
     // Tìm kiếm tài khoản theo username
-    public AccountDTO searchAccountByUsername(String username) {
+    public List<AccountDTO> searchAccountByUsername(String username) {
+        return accountDAO.searchByUsername(username);
+    }
+
+    //
+    public AccountDTO getByUsername(String username) {
         return accountDAO.getByUsername(username);
     }
 
@@ -64,5 +70,35 @@ public class AccountBUS {
     // Lấy tài khoản của nhân viên theo employeeId
     public AccountDTO getAccountByEmployeeId(int employeeId) {
         return accountDAO.getByEmployeeId(employeeId);
+    }
+
+    public AccountDTO getById(int id) {
+        return accountDAO.getById(id);
+    }
+
+    public AccountDTO login(String username, String password) {
+        if (username.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Tên người dùng không được để trống", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            return null;
+        } else {
+            AccountDTO acc = accountDAO.getByUsername(username);
+            if (acc != null) {
+                if (password.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Mật khẩu không được để trống", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                    return null;
+                } else {
+                    if (acc.getPassword().equals(password)) {
+                        return acc;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Sai mật khẩu", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                        return null;
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Người dùng không tồn tại", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                return null;
+            }
+        }
+
     }
 }
