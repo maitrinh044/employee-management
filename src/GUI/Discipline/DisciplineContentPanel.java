@@ -4,17 +4,68 @@
  */
 package GUI.Discipline;
 
+import BUS.DisciplineBUS;
+import BUS.EmployeeBUS;
+import DTO.EmployeeDTO;
+import DTO.DisciplineDTO;
+import java.awt.Color;
+import java.awt.Font;
+import java.time.LocalDate;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author MaiTrinh
  */
 public class DisciplineContentPanel extends javax.swing.JPanel {
 
+    private DisciplineBUS discBUS;
+    private EmployeeBUS emplBUS;
+    private DisciplineAdd addForm;
+    private DisciplineEdit editForm;
+
+    private List<DisciplineDTO> discList;
+
     /**
      * Creates new form DisciplineContentPanel
      */
     public DisciplineContentPanel() {
         initComponents();
+
+        discBUS = new DisciplineBUS();
+        emplBUS = new EmployeeBUS();
+
+        discList = discBUS.getAllDisciplines();
+        loadDataToTable(discList);
+    }
+
+    public void loadDataToTable(List<DisciplineDTO> discList) {
+        String[] columnNames = {"STT", "Mã nhân viên", "Tên nhân viên", "Tiền phạt", "Ngày phạt", "Mô tả"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+
+        jTable1.getTableHeader().setPreferredSize(new java.awt.Dimension(jTable1.getTableHeader().getPreferredSize().width, 40));
+        jTable1.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));  // 14 là kích cỡ chữ
+        jTable1.getTableHeader().setBackground(Color.BLACK);
+        jTable1.getTableHeader().setForeground(Color.WHITE);
+        jTable1.setShowGrid(false);  // Tắt hiển thị grid (bao gồm đường viền giữa các dòng và cột)
+        jTable1.setIntercellSpacing(new java.awt.Dimension(0, 0)); // Giảm khoảng cách giữa các ô
+
+        for (DisciplineDTO disc : discList) {
+            EmployeeDTO empl = emplBUS.getById(disc.getEmployeeId());
+            Object[] rowData = {
+                disc.getDisciplineId(),
+                disc.getEmployeeId(),
+                empl.getFullName(),
+                disc.getDisciplineAmount(),
+                disc.getDate(),
+                disc.getDescription()
+            };
+            model.addRow(rowData);
+        }
+
+        jTable1.setModel(model);
     }
 
     /**
@@ -30,12 +81,10 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         btnAdd = new javax.swing.JButton();
-        btnDel = new javax.swing.JButton();
         btnImport = new javax.swing.JButton();
         btnExport = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
         txtSearch = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -75,12 +124,6 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
             }
         });
 
-        btnDel.setBackground(new java.awt.Color(255, 102, 102));
-        btnDel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnDel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/remove.png"))); // NOI18N
-        btnDel.setText("Xóa");
-        btnDel.setPreferredSize(new java.awt.Dimension(75, 25));
-
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/excel.png"))); // NOI18N
         btnImport.setText("Nhập");
@@ -97,6 +140,11 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/edit.png"))); // NOI18N
         btnEdit.setText("Sửa");
         btnEdit.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -105,13 +153,11 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(70, 70, 70)
                 .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66)
+                .addGap(124, 124, 124)
                 .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66)
-                .addComponent(btnDel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66)
+                .addGap(133, 133, 133)
                 .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66)
+                .addGap(126, 126, 126)
                 .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(70, 70, 70))
         );
@@ -121,7 +167,6 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
                 .addGap(10, 10, 10)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnDel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -130,15 +175,6 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Tìm kiếm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
         jPanel1.setPreferredSize(new java.awt.Dimension(1000, 100));
-
-        jComboBox1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Theo tên", "Theo mã" }));
-        jComboBox1.setMinimumSize(new java.awt.Dimension(75, 25));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
 
         txtSearch.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtSearch.setPreferredSize(new java.awt.Dimension(75, 25));
@@ -150,6 +186,11 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
         jButton1.setMaximumSize(new java.awt.Dimension(75, 25));
         jButton1.setMinimumSize(new java.awt.Dimension(75, 25));
         jButton1.setPreferredSize(new java.awt.Dimension(75, 25));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -157,9 +198,7 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 678, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 814, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
@@ -169,8 +208,7 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
@@ -246,22 +284,66 @@ public class DisciplineContentPanel extends javax.swing.JPanel {
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         // TODO add your handling code here:
+        // add
+        addForm = new DisciplineAdd();
+        addForm.setTitle("Thêm kỷ luật");
+        addForm.setVisible(true);
+        addForm.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                discList = discBUS.getAllDisciplines();
+                loadDataToTable(discList);
+            }
+        });
     }//GEN-LAST:event_btnAddActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+        // edit
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow >= 0) {
+            int id = (int) jTable1.getValueAt(selectedRow, 0);
+            DisciplineDTO disc = discBUS.getById(id);
+            if (!disc.getDate().after(java.sql.Date.valueOf(LocalDate.now().withDayOfMonth(1)))) {
+                JOptionPane.showMessageDialog(null, "Chỉ được sửa khen thưởng trong tháng hiện tại", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            } else {
+                editForm = new DisciplineEdit(disc);
+                editForm.setTitle("Chỉnh sửa khen thưởng");
+                editForm.setVisible(true);
+
+                // Bắt sự kiện khi cửa sổ đóng lại
+                editForm.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosed(java.awt.event.WindowEvent e) {
+                        discList = discBUS.getAllDisciplines();
+                        loadDataToTable(discList);
+                    }
+                });
+            }
+        }
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        // search 
+        String keyword = txtSearch.getText();
+        List<DisciplineDTO> foundList = discBUS.searchDisByNameAndAmount(keyword);
+        if (!foundList.isEmpty()) {
+            loadDataToTable(foundList);
+        } else {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
-    private javax.swing.JButton btnDel;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnExport;
     private javax.swing.JButton btnImport;
     private javax.swing.JPanel headPanel9;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

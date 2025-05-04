@@ -10,6 +10,7 @@ package DAO;
  */
 import DTO.SalaryDTO;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -245,6 +246,47 @@ public class SalaryDAO {
         }
 
         return list;
+    }
+
+    public List<SalaryDTO> getTop5HighestSalariesLastMonth() {
+        List<SalaryDTO> topSalaries = new ArrayList<>();
+
+        // Tính toán tháng và năm trước
+        LocalDate now = LocalDate.now();
+        LocalDate lastMonth = now.minusMonths(1);
+        int lastMonthValue = lastMonth.getMonthValue(); // 1-12
+        int lastYearValue = lastMonth.getYear();
+
+        String sql = """
+                        SELECT s.*
+                        FROM salarys s
+                        WHERE s.month = ? AND s.year = ?
+                        ORDER BY s.salary_amount DESC
+                        LIMIT 5
+                    """;
+
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, lastMonthValue);
+            stmt.setInt(2, lastYearValue);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                SalaryDTO salary = new SalaryDTO();
+                salary.setSalaryId(rs.getInt("salary_id"));
+                salary.setEmployeeId(rs.getInt("employee_id"));
+                salary.setSalaryAmount(rs.getInt("salary_amount"));
+                salary.setMonth(rs.getInt("month"));
+                salary.setYear(rs.getInt("year"));
+                salary.setStatus(rs.getBoolean("status"));
+                topSalaries.add(salary);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return topSalaries;
     }
 
 }

@@ -4,6 +4,8 @@
  */
 package DTO;
 
+import java.sql.Date;
+
 /**
  *
  * @author MaiTrinh
@@ -11,29 +13,29 @@ package DTO;
 public class DisciplineDTO {
     private int disciplineId;
     private int employeeId;
-    private String disciplineType;
     private int disciplineAmount;
     private String description;
+    private Date discDate;
     private boolean status;
     
     public DisciplineDTO() {
     }
 
-    public DisciplineDTO(int disciplineId, int employeeId, String disciplineType, int disciplineAmount, String description, boolean status) {
+    public DisciplineDTO(int disciplineId, int employeeId, int disciplineAmount, String description, Date date, boolean status) {
         this.disciplineId = disciplineId;
         this.employeeId = employeeId;
-        this.disciplineType = disciplineType;
         this.disciplineAmount = disciplineAmount;
         this.description = description;
+        this.discDate = date;
         this.status = status;
     }
     
     public DisciplineDTO(DisciplineDTO disc) {
         this.disciplineId = disc.disciplineId;
         this.employeeId = disc.employeeId;
-        this.disciplineType = disc.disciplineType;
         this.disciplineAmount = disc.disciplineAmount;
         this.description = disc.description;
+        this.discDate = disc.discDate;
         this.status = disc.status;
     }
 
@@ -53,14 +55,6 @@ public class DisciplineDTO {
         this.employeeId = employeeId;
     }
 
-    public String getDisciplineType() {
-        return disciplineType;
-    }
-
-    public void setDisciplineType(String disciplineType) {
-        this.disciplineType = disciplineType;
-    }
-
     public int getDisciplineAmount() {
         return disciplineAmount;
     }
@@ -76,6 +70,14 @@ public class DisciplineDTO {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    public Date getDate() {
+        return discDate;
+    }
+    
+    public void setDate(Date date) {
+        this.discDate = date;
+    } 
     
     public boolean getStatus() {
         return this.status;

@@ -8,7 +8,6 @@ package DAO;
  *
  * @author MaiTrinh
  */
-
 import DTO.DepartmentDTO;
 import java.sql.*;
 import java.util.ArrayList;
@@ -27,9 +26,7 @@ public class DepartmentDAO {
         List<DepartmentDTO> list = new ArrayList<>();
         String query = "SELECT * FROM departments";
 
-        try (Connection conn = db.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 DepartmentDTO dept = new DepartmentDTO();
@@ -51,8 +48,7 @@ public class DepartmentDAO {
     public boolean add(DepartmentDTO dept) {
         String query = "INSERT INTO departments (department_name, manager_id, status) VALUES (?, ?, ?)";
 
-        try (Connection conn = db.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, dept.getDepartmentName());
             stmt.setInt(2, dept.getManagerId());
@@ -70,8 +66,7 @@ public class DepartmentDAO {
     public boolean update(DepartmentDTO dept) {
         String query = "UPDATE departments SET department_name = ?, manager_id = ?, status = ? WHERE department_id = ?";
 
-        try (Connection conn = db.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, dept.getDepartmentName());
             stmt.setInt(2, dept.getManagerId());
@@ -90,8 +85,7 @@ public class DepartmentDAO {
     public boolean updateStatus(int departmentId, boolean status) {
         String query = "UPDATE departments SET status = ? WHERE department_id = ?";
 
-        try (Connection conn = db.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setBoolean(1, status);
             stmt.setInt(2, departmentId);
@@ -109,8 +103,7 @@ public class DepartmentDAO {
         String query = "SELECT * FROM departments WHERE department_id = ?";
         DepartmentDTO dept = null;
 
-        try (Connection conn = db.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -129,5 +122,43 @@ public class DepartmentDAO {
 
         return dept;
     }
-   
+
+    public boolean delete(int departmentId) {
+        String query = "DELETE FROM departments WHERE department_id = ?";
+
+        try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, departmentId);
+            return stmt.executeUpdate() > 0; // Trả về true nếu xóa thành công
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public DepartmentDTO getDepartmentByName(String name) {
+        String query = "SELECT * FROM departments WHERE department_name = ?";
+        DepartmentDTO dept = null;
+
+        try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                dept = new DepartmentDTO();
+                dept.setDepartmentId(rs.getInt("department_id"));
+                dept.setDepartmentName(rs.getString("department_name"));
+                dept.setManagerId(rs.getInt("manager_id"));
+                dept.setStatus(rs.getBoolean("status"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return dept;
+    }
+
 }

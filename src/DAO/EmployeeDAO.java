@@ -31,9 +31,9 @@ public class EmployeeDAO {
                 EmployeeDTO employee = new EmployeeDTO();
                 employee.setEmployeeId(rs.getInt("employee_id"));
                 employee.setFullName(rs.getString("full_name"));
-                employee.setBirthday(rs.getString("birthday"));
+                employee.setBirthday(rs.getDate("birthday"));
                 employee.setGender(rs.getString("gender"));
-                employee.setPhoneNumber(rs.getLong("phone_number"));
+                employee.setPhoneNumber(rs.getString("phone_number"));
                 employee.setAddress(rs.getString("address"));
                 employee.setPositionId(rs.getInt("position_id"));
                 employee.setDepartmentId(rs.getInt("department_id"));
@@ -62,9 +62,9 @@ public class EmployeeDAO {
                 employee = new EmployeeDTO();
                 employee.setEmployeeId(rs.getInt("employee_id"));
                 employee.setFullName(rs.getString("full_name"));
-                employee.setBirthday(rs.getString("birthday"));
+                employee.setBirthday(rs.getDate("birthday"));
                 employee.setGender(rs.getString("gender"));
-                employee.setPhoneNumber(rs.getLong("phone_number"));
+                employee.setPhoneNumber(rs.getString("phone_number"));
                 employee.setAddress(rs.getString("address"));
                 employee.setPositionId(rs.getInt("position_id"));
                 employee.setDepartmentId(rs.getInt("department_id"));
@@ -87,9 +87,9 @@ public class EmployeeDAO {
         try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, employee.getFullName());
-            stmt.setString(2, employee.getBirthday());
+            stmt.setDate(2, employee.getBirthday());
             stmt.setString(3, employee.getGender());
-            stmt.setLong(4, employee.getPhoneNumber());
+            stmt.setString(4, employee.getPhoneNumber());
             stmt.setString(5, employee.getAddress());
             stmt.setInt(6, employee.getPositionId());
             stmt.setInt(7, employee.getDepartmentId());
@@ -110,9 +110,9 @@ public class EmployeeDAO {
         try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, employee.getFullName());
-            stmt.setString(2, employee.getBirthday());
+            stmt.setDate(2, employee.getBirthday());
             stmt.setString(3, employee.getGender());
-            stmt.setLong(4, employee.getPhoneNumber());
+            stmt.setString(4, employee.getPhoneNumber());
             stmt.setString(5, employee.getAddress());
             stmt.setInt(6, employee.getPositionId());
             stmt.setInt(7, employee.getDepartmentId());
@@ -148,18 +148,24 @@ public class EmployeeDAO {
 
     public List<EmployeeDTO> search(String keyword) {
         List<EmployeeDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM employees WHERE status = true AND (name LIKE ? OR position_id LIKE ?)";
+        String sql = "SELECT * FROM employees WHERE full_name LIKE ? OR phone_number LIKE ? OR address LIKE ?";
         try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, "%" + keyword + "%");
             stmt.setString(2, "%" + keyword + "%");
+            stmt.setString(3, "%" + keyword + "%");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                EmployeeDTO emp = new EmployeeDTO();
-                emp.setEmployeeId(rs.getInt("employee_id"));
-                emp.setFullName(rs.getString("name"));
-                emp.setPositionId(rs.getInt("position_id"));
-                emp.setStatus(rs.getBoolean("status"));
-                list.add(emp);
+                EmployeeDTO employee = new EmployeeDTO();
+                employee.setEmployeeId(rs.getInt("employee_id"));
+                employee.setFullName(rs.getString("full_name"));
+                employee.setBirthday(rs.getDate("birthday"));
+                employee.setGender(rs.getString("gender"));
+                employee.setPhoneNumber(rs.getString("phone_number"));
+                employee.setAddress(rs.getString("address"));
+                employee.setPositionId(rs.getInt("position_id"));
+                employee.setDepartmentId(rs.getInt("department_id"));
+                employee.setStatus(rs.getBoolean("status"));
+                list.add(employee);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -171,10 +177,10 @@ public class EmployeeDAO {
     public List<EmployeeDTO> getEmplNotAccount() {
         List<EmployeeDTO> list = new ArrayList<>();
         // Câu truy vấn JOIN với bảng `account` để lấy nhân viên chưa có tài khoản
-        String sql = "SELECT e.* " +
-                 "FROM employees e " +
-                 "LEFT JOIN accounts a ON e.employee_id = a.employee_id " +
-                 "WHERE a.employee_id IS NULL AND e.status = TRUE";
+        String sql = "SELECT e.* "
+                + "FROM employees e "
+                + "LEFT JOIN accounts a ON e.employee_id = a.employee_id "
+                + "WHERE a.employee_id IS NULL AND e.status = TRUE";
 
         try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -186,9 +192,9 @@ public class EmployeeDAO {
                 // Lấy dữ liệu từ ResultSet và gán vào đối tượng EmployeeDTO
                 emp.setEmployeeId(rs.getInt("employee_id"));
                 emp.setFullName(rs.getString("full_name"));
-                emp.setBirthday(rs.getString("birthday")); // Bạn có thể xử lý kiểu dữ liệu này nếu cần
+                emp.setBirthday(rs.getDate("birthday")); // Bạn có thể xử lý kiểu dữ liệu này nếu cần
                 emp.setGender(rs.getString("gender"));
-                emp.setPhoneNumber(rs.getLong("phone_number"));
+                emp.setPhoneNumber(rs.getString("phone_number"));
                 emp.setAddress(rs.getString("address"));
                 emp.setPositionId(rs.getInt("position_id"));
                 emp.setDepartmentId(rs.getInt("department_id"));
@@ -196,6 +202,75 @@ public class EmployeeDAO {
 
                 list.add(emp);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<EmployeeDTO> getAllEmployeeRole() {
+        List<EmployeeDTO> employeeList = new ArrayList<>();
+        String sql = "SELECT * FROM employees WHERE position_id = 3";
+
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                EmployeeDTO employee = new EmployeeDTO();
+                employee.setEmployeeId(rs.getInt("employee_id"));
+                employee.setFullName(rs.getString("full_name"));
+                employee.setBirthday(rs.getDate("birthday"));
+                employee.setGender(rs.getString("gender"));
+                employee.setPhoneNumber(rs.getString("phone_number"));
+                employee.setAddress(rs.getString("address"));
+                employee.setPositionId(rs.getInt("position_id"));
+                employee.setDepartmentId(rs.getInt("department_id"));
+                employee.setStatus(rs.getBoolean("status"));
+                employeeList.add(employee);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return employeeList;
+    }
+
+    public boolean isExistPhoneNumber(String phone) {
+        String sql = "SELECT * FROM employees WHERE phone_number = ?";
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, phone);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<EmployeeDTO> getEmployeesNotInAnyProject() {
+        List<EmployeeDTO> list = new ArrayList<>();
+        String sql = "SELECT e.* FROM employees e LEFT JOIN project_employee ep ON e.employee_id = ep.employee_id WHERE ep.project_id IS NULL";
+
+        try (Connection conn = dbConnect.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                EmployeeDTO employee = new EmployeeDTO();
+                employee.setEmployeeId(rs.getInt("employee_id"));
+                employee.setFullName(rs.getString("full_name"));
+                employee.setBirthday(rs.getDate("birthday"));
+                employee.setGender(rs.getString("gender"));
+                employee.setPhoneNumber(rs.getString("phone_number"));
+                employee.setAddress(rs.getString("address"));
+                employee.setPositionId(rs.getInt("position_id"));
+                employee.setDepartmentId(rs.getInt("department_id"));
+                employee.setStatus(rs.getBoolean("status"));
+                list.add(employee);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

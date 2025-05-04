@@ -9,8 +9,10 @@ import BUS.SalaryBUS;
 import DTO.EmployeeDTO;
 import DTO.SalaryDTO;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -143,11 +145,21 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         btnImport.setText("Nhập");
         btnImport.setToolTipText("");
         btnImport.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnImportActionPerformed(evt);
+            }
+        });
 
         btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/excel.png"))); // NOI18N
         btnExport.setText("Xuất");
         btnExport.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
 
         btnEdit.setBackground(new java.awt.Color(0, 204, 204));
         btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -332,11 +344,10 @@ public class SalaryContentPanel extends javax.swing.JPanel {
                 .addGap(100, 100, 100)
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1038, Short.MAX_VALUE)
-                    .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1038, Short.MAX_VALUE)
-                        .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, 1038, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1)))
-                .addContainerGap(50, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1038, Short.MAX_VALUE)
+                    .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, 1038, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -357,10 +368,7 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(headPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel10, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -376,7 +384,7 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         addForm = new SalaryAdd();
         addForm.setTitle("Thêm lương nhân viên");
         addForm.setVisible(true);
-        
+
         // Bắt sự kiện khi cửa sổ đóng lại
         addForm.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -444,6 +452,43 @@ public class SalaryContentPanel extends javax.swing.JPanel {
             model.setRowCount(0);
         }
     }//GEN-LAST:event_btnFilterActionPerformed
+
+    private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportActionPerformed
+        // TODO add your handling code here:
+        // import excel
+        // Đọc dữ liệu từ file Excel
+        // Tạo JFileChooser để cho phép người dùng chọn file
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn file Excel");
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xls", "xlsx"));
+
+        // Hiển thị hộp thoại chọn file
+        int returnValue = fileChooser.showOpenDialog(null);
+
+        // Kiểm tra nếu người dùng chọn file (không huỷ bỏ)
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String filePath = selectedFile.getAbsolutePath(); // Lấy đường dẫn của file
+
+            // Đọc dữ liệu từ file Excel
+            List<SalaryDTO> salaryList = salaryBUS.readExcelFile(filePath);
+
+            // Hiển thị danh sách lương (hoặc thực hiện các hành động khác)
+            for (SalaryDTO salary : salaryList) {
+                salary.setSalaryId(0);
+                salaryBUS.addSalary(salary);
+            }
+
+        }
+        salaryList = salaryBUS.getAllSalaries();
+        loadDataToTable(salaryList);
+    }//GEN-LAST:event_btnImportActionPerformed
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        // TODO add your handling code here:
+        // export excel
+        
+    }//GEN-LAST:event_btnExportActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

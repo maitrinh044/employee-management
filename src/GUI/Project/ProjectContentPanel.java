@@ -4,28 +4,29 @@
  */
 package GUI.Project;
 
+import BUS.EmployeeBUS;
 import BUS.ProjectBUS;
+import DTO.EmployeeDTO;
 import DTO.ProjectDTO;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author duyen
  */
 public class ProjectContentPanel extends javax.swing.JPanel {
+
     private final ProjectBUS projectBUS = new ProjectBUS();
-    private final DefaultTableModel tableModel;
-    private JDialog addEditDialog;
-    private JTextField txtProjectName;
-    private JTextField txtStartDate;
-    private JTextField txtEndDate;
-    private JTextField txtManagerId;
-    private JCheckBox chkStatus;
-    
+    private final EmployeeBUS emplBUS = new EmployeeBUS();
+
+    private ProjectAdd addForm;
+    private ProjectEdit editForm;
+
+    private List<ProjectDTO> prjList;
+
     /**
      * Creates new form ProjectContentPanel
      */
@@ -34,156 +35,42 @@ public class ProjectContentPanel extends javax.swing.JPanel {
      */
     public ProjectContentPanel() {
         initComponents();
-        tableModel = (DefaultTableModel) jTable1.getModel();
-        loadProjectData();
-        btnAdd.addActionListener(e -> showAddEditDialog(null));
-        btnEdit.addActionListener(e -> showEditDialog());
-        btnDel.addActionListener(e -> deleteSelectedProject());
-        jButton1.addActionListener(e -> searchProjects());
+
+        prjList = projectBUS.getAllProjects();
+        loadDataToTable(prjList);
+
     }
-    @SuppressWarnings("empty-statement")
-    private void loadProjectData() {
-        tableModel.setRowCount(0);
-        List<ProjectDTO> projects = projectBUS.getAllProjects();
-        for (ProjectDTO project : projects) {
-            tableModel.addRow(new Object[]{
-                project.getProjectId(),
-                project.getProjectName(),
-                project.getStartDate(),
-                project.getEndDate(),
-                project.getManagerId(),
-                project.getStatus()
-            });
+
+    public void loadDataToTable(List<ProjectDTO> prjList) {
+        String[] columnNames = {"STT", "Tên dự án", "Tên quản lý", "Ngày bắt đầu", "Ngày kết thúc", "Trạng thái"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+
+        jTable1.getTableHeader().setPreferredSize(new java.awt.Dimension(jTable1.getTableHeader().getPreferredSize().width, 40));
+        jTable1.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));  // 14 là kích cỡ chữ
+        jTable1.getTableHeader().setBackground(Color.BLACK);
+        jTable1.getTableHeader().setForeground(Color.WHITE);
+        jTable1.setShowGrid(false);  // Tắt hiển thị grid (bao gồm đường viền giữa các dòng và cột)
+        jTable1.setIntercellSpacing(new java.awt.Dimension(0, 0)); // Giảm khoảng cách giữa các ô
+
+        for (ProjectDTO prj : prjList) {
+            EmployeeDTO empl = emplBUS.getById(prj.getManagerId());
+
+            Object[] rowData = {
+                prj.getProjectId(),
+                prj.getProjectName(),
+                empl.getFullName(),
+                prj.getStartDate(),
+                prj.getEndDate(),
+                prj.getStatus() ? "Hoạt động" : "Không hoạt động"
+            };
+            model.addRow(rowData);
         }
+
+        jTable1.setModel(model);
     }
-
-    private void showAddEditDialog(ProjectDTO projectToEdit) {
-        addEditDialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this),
-                projectToEdit == null ? "Thêm Dự Án" : "Sửa Dự Án", true);
-        addEditDialog.setLayout(new GridLayout(6, 2, 5, 5));
-
-        txtProjectName = new JTextField(projectToEdit == null ? "" : projectToEdit.getProjectName());
-        txtStartDate = new JTextField(projectToEdit == null ? "" : projectToEdit.getStartDate());
-        txtEndDate = new JTextField(projectToEdit == null ? "" : projectToEdit.getEndDate());
-        txtManagerId = new JTextField(projectToEdit == null ? "" : String.valueOf(projectToEdit.getManagerId()));
-        chkStatus = new JCheckBox("Đang hoạt động", projectToEdit == null ? true : projectToEdit.getStatus());
-
-        addEditDialog.add(new JLabel("Tên dự án:"));
-        addEditDialog.add(txtProjectName);
-        addEditDialog.add(new JLabel("Ngày bắt đầu:"));
-        addEditDialog.add(txtStartDate);
-        addEditDialog.add(new JLabel("Ngày kết thúc:"));
-        addEditDialog.add(txtEndDate);
-        addEditDialog.add(new JLabel("ID quản lý:"));
-        addEditDialog.add(txtManagerId);
-        addEditDialog.add(new JLabel("Trạng thái:"));
-        addEditDialog.add(chkStatus);
-
-        JButton saveButton = new JButton("Lưu");
-        saveButton.addActionListener(e -> {
-            ProjectDTO newProject = new ProjectDTO();
-            newProject.setProjectName(txtProjectName.getText());
-            newProject.setStartDate(txtStartDate.getText());
-            newProject.setEndDate(txtEndDate.getText());
-            try {
-                newProject.setManagerId(Integer.parseInt(txtManagerId.getText()));
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(addEditDialog, "ID quản lý phải là số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            newProject.setStatus(chkStatus.isSelected());
-
-            boolean result;
-            if (projectToEdit == null) {
-                result = projectBUS.addProject(newProject);
-            } else {
-                newProject.setProjectId(projectToEdit.getProjectId());
-                result = projectBUS.updateProject(newProject);
-            }
-
-            if (result) {
-                loadProjectData();
-                addEditDialog.dispose();
-            } else {
-                JOptionPane.showMessageDialog(addEditDialog, "Thao tác thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        addEditDialog.add(new JLabel("")); // Placeholder for layout
-        addEditDialog.add(saveButton);
-
-        addEditDialog.pack();
-        addEditDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
-        addEditDialog.setVisible(true);
-    }
-
-    private void showEditDialog() {
-        int selectedRow = jTable1.getSelectedRow();
-        if (selectedRow >= 0) {
-            int projectId = (int) tableModel.getValueAt(selectedRow, 0);
-            ProjectDTO projectToEdit = projectBUS.getProjectById(projectId); // Cần triển khai getProjectById trong BUS
-            if (projectToEdit != null) {
-                showAddEditDialog(projectToEdit);// Sử dụng lại dialog thêm/sửa
-            } else {
-                JOptionPane.showMessageDialog(this, "Không tìm thấy dự án.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một dự án để sửa.", "Thông báo", JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private void deleteSelectedProject() {
-        int selectedRow = jTable1.getSelectedRow();
-        if (selectedRow >= 0) {
-            int projectId = (int) tableModel.getValueAt(selectedRow, 0);
-            int option = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-            if (option == JOptionPane.YES_OPTION) {
-                if (projectBUS.deleteProject(projectId)) {
-                    loadProjectData();
-                    JOptionPane.showMessageDialog(this, "Đã xóa thành công.");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Xóa thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một dự án để xóa.", "Thông báo", JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private void searchProjects() {
-        String keyword = txtSearch.getText();
-        String searchBy = (String) jComboBox1.getSelectedItem();
-        List<ProjectDTO> searchResults = projectBUS.searchProjects(keyword, searchBy);
-        tableModel.setRowCount(0);
-        for (ProjectDTO project : searchResults) {
-            tableModel.addRow(new Object[]{
-                project.getProjectId(),
-                project.getProjectName(),
-                project.getStartDate(),
-                project.getEndDate(),
-                project.getManagerId(),
-                project.getStatus()
-            });
-        }
-    }
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
-        jMenuBar2 = new javax.swing.JMenuBar();
-        jMenu3 = new javax.swing.JMenu();
-        jMenu4 = new javax.swing.JMenu();
-        jMenuBar3 = new javax.swing.JMenuBar();
-        jMenu5 = new javax.swing.JMenu();
-        jMenu6 = new javax.swing.JMenu();
-        jMenu7 = new javax.swing.JMenu();
         headPanel9 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -193,31 +80,10 @@ public class ProjectContentPanel extends javax.swing.JPanel {
         btnExport = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
         txtSearch = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-
-        jMenu1.setText("File");
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
-
-        jMenu3.setText("File");
-        jMenuBar2.add(jMenu3);
-
-        jMenu4.setText("Edit");
-        jMenuBar2.add(jMenu4);
-
-        jMenu5.setText("File");
-        jMenuBar3.add(jMenu5);
-
-        jMenu6.setText("Edit");
-        jMenuBar3.add(jMenu6);
-
-        jMenu7.setText("jMenu7");
 
         setPreferredSize(new java.awt.Dimension(1200, 700));
 
@@ -258,6 +124,11 @@ public class ProjectContentPanel extends javax.swing.JPanel {
         btnDel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/remove.png"))); // NOI18N
         btnDel.setText("Xóa");
         btnDel.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnDel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDelActionPerformed(evt);
+            }
+        });
 
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/excel.png"))); // NOI18N
@@ -275,6 +146,11 @@ public class ProjectContentPanel extends javax.swing.JPanel {
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/edit.png"))); // NOI18N
         btnEdit.setText("Sửa");
         btnEdit.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -309,15 +185,6 @@ public class ProjectContentPanel extends javax.swing.JPanel {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Tìm kiếm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
         jPanel1.setPreferredSize(new java.awt.Dimension(1000, 100));
 
-        jComboBox1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Theo tên", "Theo mã" }));
-        jComboBox1.setMinimumSize(new java.awt.Dimension(75, 25));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
-
         txtSearch.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtSearch.setPreferredSize(new java.awt.Dimension(75, 25));
         txtSearch.setVerifyInputWhenFocusTarget(false);
@@ -328,6 +195,11 @@ public class ProjectContentPanel extends javax.swing.JPanel {
         jButton1.setMaximumSize(new java.awt.Dimension(75, 25));
         jButton1.setMinimumSize(new java.awt.Dimension(75, 25));
         jButton1.setPreferredSize(new java.awt.Dimension(75, 25));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -335,9 +207,7 @@ public class ProjectContentPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 678, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 814, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
@@ -347,8 +217,7 @@ public class ProjectContentPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
@@ -428,11 +297,66 @@ public class ProjectContentPanel extends javax.swing.JPanel {
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         // TODO add your handling code here:
+        // add
+        addForm = new ProjectAdd();
+        addForm.setTitle("Thêm dự án");
+        addForm.setVisible(true);
+
+        addForm.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                prjList = projectBUS.getAllProjects();
+                loadDataToTable(prjList);
+            }
+        });
     }//GEN-LAST:event_btnAddActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+        // edit 
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow >= 0) {
+            int id = (int) jTable1.getValueAt(selectedRow, 0);
+            ProjectDTO prj = projectBUS.getProjectById(id);
+            
+            editForm = new ProjectEdit(prj);
+            editForm.setTitle("Sửa thông tin dự án");
+            editForm.setVisible(true);
+            
+            editForm.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    prjList = projectBUS.getAllProjects();
+                    loadDataToTable(prjList);
+                }
+            });
+        } else {
+            JOptionPane.showMessageDialog(null, "Vui lòng chọn một dự án để sửa thông tin", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow >= 0) {
+            int id = (int) jTable1.getValueAt(selectedRow, 0);
+            if (projectBUS.updateProjectStatus(id)) {
+                JOptionPane.showMessageDialog(null, "Cập nhật dự án thành công", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Cập nhật dự án không thành công", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            }
+            prjList = projectBUS.getAllProjects();
+                    loadDataToTable(prjList);
+        } else {
+            JOptionPane.showMessageDialog(null, "Vui lòng chọn một dự án để cập nhật", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnDelActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        // search
+        String keyword = txtSearch.getText();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -443,17 +367,6 @@ public class ProjectContentPanel extends javax.swing.JPanel {
     private javax.swing.JButton btnImport;
     private javax.swing.JPanel headPanel9;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenu jMenu5;
-    private javax.swing.JMenu jMenu6;
-    private javax.swing.JMenu jMenu7;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuBar jMenuBar2;
-    private javax.swing.JMenuBar jMenuBar3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

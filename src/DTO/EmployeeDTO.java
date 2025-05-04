@@ -5,6 +5,8 @@ package DTO;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 
+import java.sql.Date;
+
 /**
  *
  * @author MaiTrinh
@@ -12,9 +14,9 @@ package DTO;
 public class EmployeeDTO {
     private int employeeId;
     private String fullName;
-    private String birthday;
+    private Date birthday;
     private String gender;
-    private long phoneNumber;
+    private String phoneNumber;
     private String address;
     private int positionId;
     private int departmentId;
@@ -24,8 +26,8 @@ public class EmployeeDTO {
     public EmployeeDTO() {
     }
 
-    public EmployeeDTO(int employeeId, String fullName, String birthday, String gender,
-                       long phoneNumber, String address, int positionId, int departmentId, boolean status) {
+    public EmployeeDTO(int employeeId, String fullName, Date birthday, String gender,
+                       String phoneNumber, String address, int positionId, int departmentId, boolean status) {
         this.employeeId = employeeId;
         this.fullName = fullName;
         this.birthday = birthday;
@@ -66,11 +68,11 @@ public class EmployeeDTO {
         this.fullName = fullName;
     }
 
-    public String getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(String birthday) {
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
 
@@ -82,11 +84,11 @@ public class EmployeeDTO {
         this.gender = gender;
     }
 
-    public long getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(long phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 

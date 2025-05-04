@@ -80,6 +80,10 @@ public class PositionBUS {
     public PositionDTO getPositionByEmployeeId(int employeeId) {
         return positionDAO.getPositionByEmployeeId(employeeId);
     }
+    
+    public PositionDTO getPositionByName(String name) {
+        return positionDAO.getPositionByName(name);
+    }
 }
 
 

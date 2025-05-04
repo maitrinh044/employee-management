@@ -187,5 +187,29 @@ public class PositionDAO {
         return position;
     }
 
+    public PositionDTO getPositionByName(String name) {
+        PositionDTO position = null;
+        String sql = "SELECT * FROM positions WHERE position_name = ?";
+        
+        try (Connection conn = dbConnect.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, name);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    position = new PositionDTO();
+                    position.setPositionId(rs.getInt("position_id"));
+                    position.setPositionName(rs.getString("position_name"));
+                    position.setBaseSalary(rs.getInt("base_salary"));
+                    position.setStatus(rs.getBoolean("status"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return position;
+    }
 }
 

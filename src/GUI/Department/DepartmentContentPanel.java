@@ -4,17 +4,64 @@
  */
 package GUI.Department;
 
+import BUS.DepartmentBUS;
+import BUS.EmployeeBUS;
+import DTO.DepartmentDTO;
+import DTO.EmployeeDTO;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author MaiTrinh
  */
 public class DepartmentContentPanel extends javax.swing.JPanel {
 
+    private DepartmentAdd addForm;
+    private DepartmentEdit editForm;
+    private List<DepartmentDTO> dpList = new ArrayList<>();
+    private EmployeeBUS emplBUS;
+    private final DepartmentBUS departmentBUS = new DepartmentBUS();
+
     /**
      * Creates new form DepartmentContentPanel
      */
     public DepartmentContentPanel() {
         initComponents();
+
+        emplBUS = new EmployeeBUS();
+        dpList = departmentBUS.getAllDepartments();
+        loadDataToTable(dpList);
+
+    }
+
+    public void loadDataToTable(List<DepartmentDTO> dpList) {
+        String[] columnNames = {"STT", "Tên phòng ban", "Mã quản lý", "Tên quản lý", "Trạng thái"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+
+        jTable1.getTableHeader().setPreferredSize(new java.awt.Dimension(jTable1.getTableHeader().getPreferredSize().width, 40));
+        jTable1.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));  // 14 là kích cỡ chữ
+        jTable1.getTableHeader().setBackground(Color.BLACK);
+        jTable1.getTableHeader().setForeground(Color.WHITE);
+        jTable1.setShowGrid(false);  // Tắt hiển thị grid (bao gồm đường viền giữa các dòng và cột)
+        jTable1.setIntercellSpacing(new java.awt.Dimension(0, 0)); // Giảm khoảng cách giữa các ô
+
+        for (DepartmentDTO dp : dpList) {
+            EmployeeDTO empl = emplBUS.getById(dp.getManagerId());
+            Object[] rowData = {
+                dp.getDepartmentId(),
+                dp.getDepartmentName(),
+                dp.getManagerId(),
+                empl.getFullName(),
+                dp.isStatus() ? "Hoạt động" : "Không hoạt động"
+            };
+            model.addRow(rowData);
+        }
+
+        jTable1.setModel(model);
     }
 
     /**
@@ -35,13 +82,11 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
         btnExport = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
         txtSearch = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-
-        setPreferredSize(new java.awt.Dimension(1200, 700));
+        jPanel4 = new javax.swing.JPanel();
 
         headPanel.setBackground(new java.awt.Color(255, 255, 255));
         headPanel.setMaximumSize(new java.awt.Dimension(1200, 100));
@@ -57,6 +102,9 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
             headPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 82, Short.MAX_VALUE)
         );
+
+        setBackground(new java.awt.Color(255, 255, 255));
+        setPreferredSize(new java.awt.Dimension(1200, 700));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setMaximumSize(new java.awt.Dimension(1200, 600));
@@ -97,6 +145,11 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/edit.png"))); // NOI18N
         btnEdit.setText("Sửa");
         btnEdit.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -131,15 +184,6 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Tìm kiếm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
         jPanel1.setPreferredSize(new java.awt.Dimension(1000, 100));
 
-        jComboBox1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Theo tên", "Theo mã" }));
-        jComboBox1.setMinimumSize(new java.awt.Dimension(75, 25));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
-
         txtSearch.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtSearch.setPreferredSize(new java.awt.Dimension(75, 25));
         txtSearch.setVerifyInputWhenFocusTarget(false);
@@ -150,6 +194,11 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
         jButton1.setMaximumSize(new java.awt.Dimension(75, 25));
         jButton1.setMinimumSize(new java.awt.Dimension(75, 25));
         jButton1.setPreferredSize(new java.awt.Dimension(75, 25));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -157,9 +206,7 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 678, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 814, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
@@ -169,8 +216,7 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
@@ -183,15 +229,23 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
         jTable1.setForeground(new java.awt.Color(255, 255, 255));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "STT", "Mã phòng ban", "Tên phòng ban", "Mã quản lý", "Trạng thái"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         jTable1.setAlignmentX(0.0F);
         jTable1.setAlignmentY(0.0F);
         jTable1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -224,7 +278,20 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(35, 35, 35)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(56, Short.MAX_VALUE))
+        );
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1200, Short.MAX_VALUE)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 60, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -232,25 +299,71 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(headPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(headPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 74, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 640, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         // TODO add your handling code here:
+        // add
+        addForm = new DepartmentAdd();
+        addForm.setTitle("Thêm phòng ban");
+        addForm.setVisible(true);
+
+        addForm.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                dpList = departmentBUS.getAllDepartments();
+                loadDataToTable(dpList);
+            }
+        });
     }//GEN-LAST:event_btnAddActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+        // edit
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow >= 0) {
+            int id = (int) jTable1.getValueAt(selectedRow, 0);
+            DepartmentDTO dp = departmentBUS.getDepartmentById(id);
+            editForm = new DepartmentEdit(dp);
+            editForm.setTitle("Sửa thông tin phòng ban");
+            editForm.setVisible(true);
+            editForm.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    dpList = departmentBUS.getAllDepartments();
+                    loadDataToTable(dpList);
+                }
+            });
+        } else {
+            JOptionPane.showMessageDialog(null, "Vui lòng chọn một phòng ban để sửa thông tin", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:\
+        // search
+        String keyword = txtSearch.getText();
+        List<DepartmentDTO> foundList = departmentBUS.searchDepartments(keyword);
+        if (!foundList.isEmpty()) {
+            loadDataToTable(foundList);
+        } else {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -261,12 +374,13 @@ public class DepartmentContentPanel extends javax.swing.JPanel {
     private javax.swing.JButton btnImport;
     private javax.swing.JPanel headPanel;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
+
 }

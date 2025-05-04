@@ -29,13 +29,13 @@ public class ProfileContentPanel extends javax.swing.JPanel {
         
         EmployeeDTO empl = emplBUS.getById(user.getEmployeeId());
         lblName.setText(empl.getFullName());
-        lblBirth.setText(empl.getBirthday());
+        lblBirth.setText(String.valueOf(empl.getBirthday()));
         lblAdress.setText(empl.getAddress());
         lblGender.setText(empl.getGender());
         lblPhone.setText(String.valueOf(empl.getPhoneNumber()));
         
         lblPosition.setText(positionBUS.getPositionByEmployeeId(empl.getEmployeeId()).getPositionName());
-        lblDepart.setText(departBUS.getById(empl.getDepartmentId()).getDepartmentName());
+        lblDepart.setText(departBUS.getDepartmentById(empl.getDepartmentId()).getDepartmentName());
     }
 
     /**

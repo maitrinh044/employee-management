@@ -4,6 +4,8 @@
  */
 package DTO;
 
+import java.sql.Date;
+
 /**
  *
  * @author duyen
@@ -11,15 +13,15 @@ package DTO;
 public class ProjectDTO {
     private int projectId;
     private String projectName;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
     private int managerId;
     boolean status;
 
     public ProjectDTO() {
     }
 
-    public ProjectDTO(int projectId, String projectName, String startDate, String endDate, int managerId, boolean status) {
+    public ProjectDTO(int projectId, String projectName, Date startDate, Date endDate, int managerId, boolean status) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.startDate = startDate;
@@ -48,19 +50,19 @@ public class ProjectDTO {
         this.projectName = projectName;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 

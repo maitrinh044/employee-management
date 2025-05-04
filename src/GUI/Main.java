@@ -8,6 +8,7 @@ package GUI;
  *
  * @author MaiTrinh
  */
+import GUI.Stats.StatisticContentPanel;
 import DTO.AccountDTO;
 import GUI.Reward.RewardContentPanel;
 import GUI.Discipline.DisciplineContentPanel;

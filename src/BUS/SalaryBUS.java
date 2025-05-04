@@ -12,6 +12,7 @@ import DAO.SalaryDAO;
 import DTO.PositionDTO;
 import DTO.SalaryDTO;
 import java.util.List;
+import org.apache.poi.ss.usermodel.Row;
 
 public class SalaryBUS {
     private final SalaryDAO salaryDAO;
@@ -94,6 +95,28 @@ public class SalaryBUS {
         int totalSalary = baseSalary + totalReward - totalDiscipline;
 
         return totalSalary;
+    }
+    
+    public List<SalaryDTO> getTop5HighestSalariesLastMonth() {
+        return salaryDAO.getTop5HighestSalariesLastMonth();
+    }
+    
+    // Hàm đọc file Excel và chuyển thành danh sách SalaryDTO
+    public List<SalaryDTO> readExcelFile(String filePath) {
+        return ExcelReader.readExcelFileGeneric(filePath, new ExcelReader.ExcelRowMapper<SalaryDTO>() {
+            @Override
+            public SalaryDTO map(Row row) {
+                SalaryDTO salary = new SalaryDTO();
+
+                // Ánh xạ dữ liệu từ các cột trong file Excel vào SalaryDTO
+                salary.setEmployeeId((int) row.getCell(0).getNumericCellValue()); // Cột 0: Employee ID
+                salary.setSalaryAmount((int) row.getCell(1).getNumericCellValue());     // Cột 1: Salary Amount
+                salary.setMonth((int) row.getCell(2).getNumericCellValue());      // Cột 2: Month
+                salary.setYear((int) row.getCell(3).getNumericCellValue());       // Cột 3: Year
+
+                return salary;
+            }
+        });
     }
 }
 

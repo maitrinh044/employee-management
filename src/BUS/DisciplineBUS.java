@@ -24,6 +24,10 @@ public class DisciplineBUS {
     public List<DisciplineDTO> getAllDisciplines() {
         return disciplineDAO.getAll();
     }
+    
+    public DisciplineDTO getById(int id) {
+        return disciplineDAO.getById(id);
+    }
 
     // Thêm kỷ luật cho nhân viên
     public boolean addDiscipline(DisciplineDTO discipline) {
@@ -33,6 +37,14 @@ public class DisciplineBUS {
             return false;
         }
         return disciplineDAO.add(discipline);
+    }
+    
+    public boolean update(DisciplineDTO disc) {
+        return disciplineDAO.update(disc);
+    }
+
+    public List<DisciplineDTO> searchDisByNameAndAmount(String keyword) {
+        return disciplineDAO.searchDisByNameAndAmount(keyword);
     }
 
     // Cập nhật trạng thái kỷ luật
