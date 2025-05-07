@@ -15,6 +15,7 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import BUS.PdfExporter;
 
 /**
  *
@@ -94,6 +95,7 @@ public class SalaryContentPanel extends javax.swing.JPanel {
         btnImport = new javax.swing.JButton();
         btnExport = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
+        btnExportPdf = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         txtSearch = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
@@ -172,6 +174,16 @@ public class SalaryContentPanel extends javax.swing.JPanel {
             }
         });
 
+        btnExportPdf.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnExportPdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/Icons/pdf.png"))); // NOI18N
+        btnExportPdf.setText("Xuất");
+        btnExportPdf.setPreferredSize(new java.awt.Dimension(75, 25));
+        btnExportPdf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportPdfActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
@@ -179,13 +191,15 @@ public class SalaryContentPanel extends javax.swing.JPanel {
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addGap(70, 70, 70)
                 .addComponent(btnAdd4, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(125, 125, 125)
+                .addGap(75, 75, 75)
                 .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(148, 148, 148)
+                .addGap(90, 90, 90)
                 .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(110, 110, 110)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(70, 70, 70))
+                .addGap(76, 76, 76)
+                .addComponent(btnExportPdf, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(50, 50, 50))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -195,7 +209,8 @@ public class SalaryContentPanel extends javax.swing.JPanel {
                     .addComponent(btnAdd4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExportPdf, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -488,14 +503,25 @@ public class SalaryContentPanel extends javax.swing.JPanel {
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
         // TODO add your handling code here:
         // export excel
-        
+        SalaryBUS salaryBUS = new SalaryBUS();
+        List<SalaryDTO> list = salaryBUS.getAllSalaries(); // hoặc lấy danh sách bạn có sẵn
+        salaryBUS.writeSalaryToExcel("D:/HOCHANH/java/employee-management/src/Resources/salaries.xlsx", list);
+
     }//GEN-LAST:event_btnExportActionPerformed
+
+    private void btnExportPdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportPdfActionPerformed
+        // TODO add your handling code here:
+        PdfExporter exporter = new PdfExporter();
+        exporter.exportToPdf(salaryList, "salary_report.pdf");
+        // Hiện dialog sau khi xuất
+    }//GEN-LAST:event_btnExportPdfActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd4;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnExport;
+    private javax.swing.JButton btnExportPdf;
     private javax.swing.JButton btnFilter;
     private javax.swing.JButton btnImport;
     private javax.swing.JComboBox<Integer> cbbMonth;
