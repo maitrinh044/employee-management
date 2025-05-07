@@ -51,27 +51,33 @@ public class SalaryStats extends javax.swing.JPanel {
                 lbl1.setText(String.valueOf(topSalaries.get(0)));
                 break;
             case 2:
-                lbl1.setText(String.valueOf(topSalaries.get(0)));
-                lbl2.setText(String.valueOf(topSalaries.get(1)));
+                lbl1.setText(emBUS.getById(topSalaries.get(0).getEmployeeId()).getFullName());
+                lbl2.setText(emBUS.getById(topSalaries.get(1).getEmployeeId()).getFullName());
                 break;
             case 3:
-                lbl1.setText(String.valueOf(topSalaries.get(0)));
-                lbl2.setText(String.valueOf(topSalaries.get(1)));
-                lbl3.setText(String.valueOf(topSalaries.get(2)));
+                lbl1.setText(emBUS.getById(topSalaries.get(0).getEmployeeId()).getFullName());
+                lbl2.setText(emBUS.getById(topSalaries.get(1).getEmployeeId()).getFullName());
+                lbl3.setText(emBUS.getById(topSalaries.get(2).getEmployeeId()).getFullName());
                 break;
             case 4:
-                lbl1.setText(String.valueOf(topSalaries.get(0)));
-                lbl2.setText(String.valueOf(topSalaries.get(1)));
-                lbl3.setText(String.valueOf(topSalaries.get(2)));
-                lbl4.setText(String.valueOf(topSalaries.get(3)));
+                lbl1.setText(emBUS.getById(topSalaries.get(0).getEmployeeId()).getFullName());
+                lbl2.setText(emBUS.getById(topSalaries.get(1).getEmployeeId()).getFullName());
+                lbl3.setText(emBUS.getById(topSalaries.get(2).getEmployeeId()).getFullName());
+                lbl4.setText(emBUS.getById(topSalaries.get(3).getEmployeeId()).getFullName());
                 break;
             case 5:
-                lbl1.setText(String.valueOf(topSalaries.get(0)));
-                lbl2.setText(String.valueOf(topSalaries.get(1)));
-                lbl3.setText(String.valueOf(topSalaries.get(2)));
-                lbl4.setText(String.valueOf(topSalaries.get(3)));
-                lbl5.setText(String.valueOf(topSalaries.get(4)));
+                lbl1.setText(emBUS.getById(topSalaries.get(0).getEmployeeId()).getFullName());
+                lbl2.setText(emBUS.getById(topSalaries.get(1).getEmployeeId()).getFullName());
+                lbl3.setText(emBUS.getById(topSalaries.get(2).getEmployeeId()).getFullName());
+                lbl4.setText(emBUS.getById(topSalaries.get(3).getEmployeeId()).getFullName());
+                lbl5.setText(emBUS.getById(topSalaries.get(4).getEmployeeId()).getFullName());
                 break;
+            default:
+                lbl1.setText("Không có dữ liệu");
+                lbl2.setText("Không có dữ liệu");
+                lbl3.setText("Không có dữ liệu");
+                lbl4.setText("Không có dữ liệu");
+                lbl5.setText("Không có dữ liệu");
         }
     }
 
