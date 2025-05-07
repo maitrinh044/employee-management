@@ -476,6 +476,7 @@ public class SalaryContentPanel extends javax.swing.JPanel {
             // Hiển thị danh sách lương (hoặc thực hiện các hành động khác)
             for (SalaryDTO salary : salaryList) {
                 salary.setSalaryId(0);
+                System.out.println(salary);
                 salaryBUS.addSalary(salary);
             }
 
